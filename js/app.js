@@ -223,7 +223,16 @@ function toggleStep(s, g, st, checkBtn) {
   state.ticks[st.id] = Date.now();
   save();
   checkBtn?.classList.add('squish');
-  checkBtn?.closest('.step')?.classList.add('done');
+  const li = checkBtn?.closest('.step');
+  li?.classList.add('done');
+  const willHide = !!li && !ui.whole && Number(state.settings.stepsVisible) !== 0 && !ui.showDone;
+  if (willHide) {
+    setTimeout(() => {
+      li.style.setProperty('--h', `${li.offsetHeight}px`);
+      li.classList.add('leaving');
+      sfx.whoosh();
+    }, 320);
+  }
   checkBtn?.setAttribute('aria-pressed', 'true');
   sfx.tick();
   sprint();
@@ -241,12 +250,12 @@ function toggleStep(s, g, st, checkBtn) {
       const part = currentPart(s);
       if (part.mode === 'prep') state.active[s.id] = null; else state.stage[part.id] = null;
       ui.showDone = false; ui.ifOpen = false;
-      save(); renderView(); window.scrollTo({ top: 0, behavior: 'smooth' });
+      save(); renderView(); if (!ui.whole) window.scrollTo({ top: 0, behavior: 'smooth' });
       maybeCelebrate(s);
     }, 2300);
   } else {
     maybePraise();
-    setTimeout(renderView, 520);
+    setTimeout(renderView, willHide ? 900 : 520);
   }
 }
 function maybeCelebrate(s) {
@@ -273,6 +282,10 @@ function renderView() {
 function viewToday() {
   const s = sec(); const part = currentPart(s);
   const out = [];
+  out.push(h('div', { class: 'viewbar' },
+    h('button', { class: `viewbtn${ui.whole ? '' : ' on'}`, 'aria-pressed': String(!ui.whole), onclick: () => { if (!ui.whole) return; sfx.softTap(); ui.whole = false; renderView(); window.scrollTo({ top: 0 }); } }, 'One at a time'),
+    h('button', { class: `viewbtn${ui.whole ? ' on' : ''}`, 'aria-pressed': String(ui.whole), onclick: () => { if (ui.whole) return; sfx.softTap(); ui.whole = true; renderView(); } }, 'Whole view')));
+  if (ui.whole) return [...out, h('section', { class: 'panel whole' }, viewWhole(s))];
   if (s.parts.length > 1) {
     out.push(h('div', { class: 'parts', role: 'tablist' }, s.parts.map((p) => h('button', {
       class: p.id === part.id ? 'on' : '', role: 'tab', 'aria-selected': String(p.id === part.id),
@@ -290,6 +303,31 @@ function viewToday() {
       out.push(h('button', { class: 'calm-pill', onclick: openOverwhelm }, '💜 I’m overwhelmed'));
       out.push(...viewGroup(s, part, g, true));
     } else out.push(viewDoneCard(s, groupsOf(s, part.id)));
+  }
+  return out;
+}
+
+// Every step of the day in one scrolling list, ticked ones included, with a divider per group.
+function viewWhole(s) {
+  const out = [];
+  for (const part of s.parts) {
+    if (s.parts.length > 1) out.push(h('div', { class: 'whole-part' }, part.label));
+    const ids = part.order || groupsOf(s, part.id).map((g) => g.id);
+    for (const g of ids.map((id) => s.groups.find((x) => x.id === id))) {
+      const cs = checks(g); const d = cs.filter(isTicked).length;
+      const star = h('span', { class: 'whole-star' });
+      if (d === cs.length) star.append(starSvg(g.color));
+      out.push(h('div', { class: 'whole-divider' },
+        h('span', { class: 'whole-name' }, gi(g), ` ${g.name}`),
+        h('span', { class: 'whole-count' }, d === cs.length ? 'Done' : `${d}/${cs.length}`), star));
+      const list = h('ul', { class: 'steps whole-steps' });
+      for (const st of g.steps) {
+        if (st.t === 'if') continue;
+        if (st.t === 'info') { list.append(h('li', { class: 'note' }, st.text)); continue; }
+        list.append(stepItem(s, g, st, { quiet: true }));
+      }
+      out.push(list);
+    }
   }
   return out;
 }
@@ -438,9 +476,9 @@ function viewGroup(s, part, g, journey) {
   return out;
 }
 
-function stepItem(s, g, st) {
+function stepItem(s, g, st, { quiet = false } = {}) {
   const ticked = isTicked(st);
-  const isNew = !ui.shown.has(st.id); ui.shown.add(st.id);
+  const isNew = !quiet && !ui.shown.has(st.id); ui.shown.add(st.id);
   const btn = h('button', { class: 'check', 'aria-pressed': String(ticked), 'aria-label': `${ticked ? 'Done' : 'Mark done'}: ${st.text}` });
   btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   btn.addEventListener('click', () => toggleStep(s, g, st, btn));

@@ -92,9 +92,13 @@ Keep all other artwork below y=62.""",
     "scene-train": """viewBox="0 0 400 220".
 A calm TRAIN PLATFORM scene drawn as a rounded card: clip everything to a rounded rect
 (x=0 y=0 w=400 h=220 rx=24). Pale sky (#DCE9FF to #EDE6FF) with pastel clouds, a glass platform canopy.
-A cute, rounded modern commuter train (lilac #C9B8F5 and white body, purple stripe, round-cornered windows,
-round headlights, NO face) stopped at the platform, seen from a 3/4 front view coming from the right,
-taking up the middle/right. Platform at the bottom with a soft-yellow safety line, a little bench on the left,
+A cute, rounded modern commuter train stopped at the platform, in a clean SIDE VIEW facing RIGHT, taking up
+the middle/right (from about x=150 to x=385). The train is ONE continuous body drawn as a single outlined shape:
+a long rounded rectangle whose right end curves smoothly into a gently sloped, rounded nose (like a modern
+commuter/regional train). The nose is part of the same body path: NOT a separate box, cab or car stuck on.
+White lower body, lilac (#C9B8F5) upper body, one purple (#7B5CC4) stripe running the full length including
+the nose, a row of 3 rounded square windows, one door with a small window, a slanted windscreen window on the
+nose, one round headlight low on the nose, simple dark-purple wheels/bogies under the body. NO face. Platform at the bottom with a soft-yellow safety line, a little bench on the left,
 a round platform clock on a pole, a small potted plant. A few sparkles.
 HANGING SIGN at the top, NOTHING may overlap it:
   two short strings from the top edge to a rounded rect x=100 y=14 width=200 height=42 rx=12

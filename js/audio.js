@@ -170,3 +170,16 @@ export function softTap() {
   const g = c.createGain(); env(g, t, 0.003, 0.12, 0.05);
   o.connect(g).connect(master); o.start(t); o.stop(t + 0.08);
 }
+
+// Soft "swoosh" as a ticked step folds away.
+export function whoosh() {
+  if (!settings.sTick) return;
+  const c = ac(); if (!c) return;
+  const t = c.currentTime + 0.01;
+  const n = c.createBufferSource(); n.buffer = noiseBuffer(c, 0.4);
+  const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.4;
+  bp.frequency.setValueAtTime(500, t); bp.frequency.exponentialRampToValueAtTime(2600, t + 0.28);
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.1); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
+  n.connect(bp).connect(g).connect(master); n.start(t); n.stop(t + 0.4);
+}
