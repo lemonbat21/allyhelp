@@ -21,9 +21,9 @@ export const SECTIONS = [
   // ───────────────────────────── SECTION 1 ─────────────────────────────
   {
     id: 'prep', emoji: '📅', title: 'Day before prep', date: 'Mon 9 Nov', short: 'Prep',
-    intro: 'Little groups, any order. Pick whichever feels easiest 💜',
     done: { title: 'Done = rest 💜', text: "Tomorrow's you has everything ready." },
-    parts: [{ id: 'prep-a', mode: 'prep', label: 'Mon 9 Nov' }],
+    parts: [{ id: 'prep-a', mode: 'prep', label: 'Mon 9 Nov',
+      order: ['p-checkin', 'p-phone', 'p-pouch', 'p-train', 'p-backup', 'p-bag', 'p-me', 'p-harry', 'p-bed', 'p-tidy'] }],
     groups: [
       { id: 'p-checkin', part: 'prep-a', icon: '✈️', name: 'Check in', color: STAR.mint, badge: 'first', scene: 'suitcase', sign: 'Check in',
         steps: [
@@ -101,7 +101,6 @@ export const SECTIONS = [
   // ───────────────────────────── SECTION 2 ─────────────────────────────
   {
     id: 'flight', emoji: '✈️', title: 'Flight day', date: 'Tue 10 Nov', short: 'Flight',
-    intro: 'One stage at a time. I’ll be with you the whole way 💜',
     done: { title: 'You did it 💜', text: 'You actually did it. I’m so proud of you.' },
     parts: [{ id: 'flight-a', mode: 'journey', label: 'Tue 10 Nov',
       times: [['🕖', '07:45', 'leave home'], ['🕚', '11:00', 'sit at the gate'], ['🚪', '11:20', 'gate closes (final!)'], ['✈️', '11:50', 'flight FR746']],
@@ -194,10 +193,9 @@ export const SECTIONS = [
   // ───────────────────────────── SECTION 3 ─────────────────────────────
   {
     id: 'home', emoji: '🔁', title: 'Flight home', date: 'Mon 23 & Tue 24 Nov', short: 'Home',
-    intro: 'Same as before, just the other way 💜',
     done: { title: 'Home sweet home 💜', text: 'You did the whole trip. Rest now, you earned it.' },
     parts: [
-      { id: 'home-a', mode: 'prep', label: 'Mon 23 · Day before' },
+      { id: 'home-a', mode: 'prep', label: 'Mon 23 · Day before', order: ['h-checkin', 'h-pack', 'h-plan'] },
       { id: 'home-b', mode: 'journey', label: 'Tue 24 · Travel day', uk: true,
         times: [['🕚', '11:15', 'be at Bristol Airport'], ['🚪', '12:55', 'gate closes'], ['✈️', '13:25', 'flight FR745'], ['🛬', '16:25', 'land in Copenhagen']],
         timesAt: ['2026-11-24T11:15:00Z', '2026-11-24T12:55:00Z', '2026-11-24T13:25:00Z', '2026-11-24T16:25:00+01:00'] },

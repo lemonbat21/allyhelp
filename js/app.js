@@ -87,6 +87,21 @@ function currentGroup() {
   if (part.mode === 'journey') return currentStage(s, part);
   return s.groups.find((g) => g.id === state.active[s.id]) || null;
 }
+const isLocked = (st) => !!st.opensAt && !isTicked(st) && Date.now() < new Date(st.opensAt).getTime();
+const nextStep = (g) => checks(g).find((x) => !isTicked(x));
+// The most sensible group to do next: follows the part's `order`, skips finished,
+// skipped-for-later and "can't do this yet" (time-locked) groups.
+function nextLogical(s, part, excludeId) {
+  const ids = part.order || groupsOf(s, part.id).map((g) => g.id);
+  const gs = ids.map((id) => s.groups.find((g) => g.id === id)).filter(Boolean);
+  const open = gs.filter((g) => g.id !== excludeId && !groupDone(g) && !state.skipped[g.id]);
+  return open.find((g) => !isLocked(nextStep(g))) || open[0] || null;
+}
+const partStarted = (s, part) => groupsOf(s, part.id).some((g) => state.groupDone[g.id] || checks(g).some(isTicked));
+function startGroup(s, g) {
+  state.active[s.id] = g.id; ui.showDone = false; ui.ifOpen = false; ui.shown.clear(); save();
+}
+
 function suggestedSection() {
   const d = dayIn(new Date());
   if (d >= '2026-11-23') return 'home';
@@ -248,7 +263,8 @@ function viewToday() {
     }, p.label))));
   }
   if (part.mode === 'prep') {
-    const g = s.groups.find((x) => x.id === state.active[s.id] && x.part === part.id);
+    let g = s.groups.find((x) => x.id === state.active[s.id] && x.part === part.id);
+    if (!g && !partStarted(s, part)) { g = nextLogical(s, part); if (g) startGroup(s, g); }
     out.push(...(g ? viewGroup(s, part, g, false) : viewPicker(s, part)));
   } else {
     out.push(viewTimes(part));
@@ -271,8 +287,7 @@ function viewPicker(s, part) {
   if (!remaining.length) {
     out.push(viewDoneCard(s, gs));
   } else {
-    if (!anyDone) out.push(h('p', { class: 'muted', style: { margin: '14px 2px 0' } }, s.intro));
-    out.push(h('div', { class: 'picker-ask' }, anyDone ? 'Which would you like to do next?' : 'Which would you like to start with?'));
+    out.push(h('div', { class: 'picker-ask' }, 'What next?'));
   }
   const grid = h('div', { class: 'picker' });
   let lastHeading = null; let i = 0;
@@ -330,8 +345,9 @@ function viewGroup(s, part, g, journey) {
   const out = [];
   const cs = checks(g); const doneN = cs.filter(isTicked).length; const done = doneN === cs.length;
   if (!journey) {
+    const canChoose = groupsOf(s, part.id).some((x) => state.groupDone[x.id]);
     out.push(h('div', { class: 'topbar' },
-      h('button', { class: 'link', onclick: () => { sfx.softTap(); state.active[s.id] = null; save(); renderView(); } }, '← Choose a different one'),
+      canChoose ? h('button', { class: 'link', onclick: () => { sfx.softTap(); state.active[s.id] = null; save(); renderView(); } }, '← Choose a different one') : h('span'),
       !done && g.badge !== 'first' ? h('button', { class: 'link', onclick: () => {
         sfx.softTap(); state.skipped[g.id] = true; state.active[s.id] = null; save(); renderView();
         bubble('That’s okay, we can come back to it 💜');
@@ -374,6 +390,15 @@ function viewGroup(s, part, g, journey) {
     list.append(stepItem(s, g, st));
   });
   out.push(list);
+  if (!journey) {
+    const nx = nextStep(g);
+    if (nx && isLocked(nx)) {
+      const alt = nextLogical(s, part, g.id);
+      out.push(h('div', { class: 'card', style: { textAlign: 'center' } },
+        h('p', { style: { fontWeight: 800, margin: '2px 0 12px' } }, `🕐 This one ${nx.opensLabel}.`),
+        alt ? h('button', { class: 'btn primary', onclick: () => { sfx.softTap(); startGroup(s, alt); renderView(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }, `Do ${alt.icon} ${alt.name} until then`) : null));
+    }
+  }
   if (!unticked.length && !journey) {
     out.push(h('div', { class: 'card', style: { textAlign: 'center' } },
       h('p', { style: { fontWeight: 900, fontSize: '1.15rem', margin: '4px 0 12px' } }, 'This group is finished ⭐'),
@@ -403,7 +428,7 @@ function stepItem(s, g, st) {
   const txt = h('div', { class: 'txt' }, h('div', { class: 'main' }, st.text));
   if (st.chips) txt.append(h('div', { class: 'chips' }, st.chips.map((c) => h('span', { class: 'chip' }, `⏰ ${c}`))));
   if (st.detail) txt.append(h('div', { class: 'detail' }, st.detail));
-  if (st.opensAt && !ticked && Date.now() < new Date(st.opensAt).getTime()) txt.append(h('span', { class: 'opens' }, `🕐 ${st.opensLabel}, you can do other groups first`));
+  if (st.opensAt && !ticked && Date.now() < new Date(st.opensAt).getTime()) txt.append(h('span', { class: 'opens' }, `🕐 ${st.opensLabel}`));
   if (st.say) txt.append(sayCard(st.say));
   if (st.action === 'wallet') txt.append(h('div', { class: 'mini-actions' }, h('button', { class: 'btn small soft', onclick: () => go('wallet') }, '🎫 Open Wallet')));
   if (st.action === 'address') txt.append(h('div', { class: 'mini-actions' }, h('button', { class: 'btn small soft', onclick: () => state.info.address ? bigSay(state.info.address, 'My address in the UK') : go('wallet') }, '🏠 Show my address big')));
@@ -846,9 +871,8 @@ function welcome() {
   const cat = svgEl('cloud-cat'); cat.style.width = '170px';
   const node = h('div', { class: 'card', style: { width: 'min(440px, calc(100% - 32px))', textAlign: 'center' } },
     h('div', { style: { display: 'flex', justifyContent: 'center' } }, cat),
-    h('p', { style: { fontSize: '1.3rem', fontWeight: 900, margin: '6px 0' } }, 'Hi, I’m your little cloud cat 💜'),
-    h('p', { class: 'muted' }, 'I’ll help you with your trip, one small step at a time. Tick things off and I’ll collect stars for you. Tap me any time if you want a stroke or some help.'),
-    h('p', { class: 'muted', style: { fontSize: '.9rem' } }, 'Tip: add me to your home screen (Share → Add to Home Screen) so I’m always there, even without internet.'),
+    h('p', { style: { fontSize: '1.3rem', fontWeight: 900, margin: '6px 0' } }, 'Hi, I’m your cloud cat 💜'),
+    h('p', { class: 'muted' }, 'Tap me if you need me.'),
     h('button', { class: 'btn primary block', onclick: () => { state.welcomed = true; save(); sfx.unlock(); sfx.chime(); closeOverlay(); } }, 'Let’s go ✨'));
   openOverlay(node, 'center');
 }
