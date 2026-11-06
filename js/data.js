@@ -192,7 +192,7 @@ export const SECTIONS = [
 
   // ───────────────────────────── SECTION 3 ─────────────────────────────
   {
-    id: 'home', emoji: '🔁', title: 'Flight home', date: 'Mon 23 & Tue 24 Nov', short: 'Home',
+    id: 'home', emoji: '🔁', title: 'Flight back', date: 'Mon 23 & Tue 24 Nov', short: 'Flight back',
     done: { title: 'Home sweet home 💜', text: 'You did the whole trip. Rest now, you earned it.' },
     parts: [
       { id: 'home-a', mode: 'prep', label: 'Mon 23 · Day before', order: ['h-checkin', 'h-pack', 'h-plan'] },
