@@ -812,20 +812,13 @@ function openCatMenu() {
 }
 
 // ── Help ──
+// Three choices only. The ready-made answers live on each stage under "If something goes differently".
 function openHelp() {
   sfx.softTap();
-  const s = sec(); const g = currentGroup();
-  const items = [];
-  if (g) g.steps.filter((x) => x.t === 'if').forEach((x) => items.push({ ...x, cls: 'if' }));
-  s.help.forEach((x) => items.push({ ...x, cls: s.id === 'prep' ? '' : 'if' }));
-  items.push({ ...OVERWHELM, cls: 'calm', overwhelm: true });
-  const body = h('div', {},
-    g ? h('p', { class: 'muted', style: { margin: '0 2px 10px' } }, 'You’re on: ', gi(g), ` ${g.name}`) : null,
-    h('div', { class: 'helplist' },
-      items.map((it) => h('button', { class: `helpbtn ${it.cls}`, onclick: () => (it.overwhelm ? openOverwhelm() : showAnswer(it)) }, it.q)),
-      h('div', { class: 'h3' }, 'Or talk to me'),
-      h('button', { class: 'helpbtn', onclick: () => openChat('something') }, '✏️ Something else'),
-      h('button', { class: 'helpbtn heart-btn', onclick: () => openChat('support') }, '💜 Reassurance and support')));
+  const body = h('div', { class: 'helplist' },
+    h('button', { class: 'helpbtn calm', onclick: openOverwhelm }, '💜 I’m overwhelmed'),
+    h('button', { class: 'helpbtn', onclick: () => openChat('something') }, '✏️ Something else'),
+    h('button', { class: 'helpbtn heart-btn', onclick: () => openChat('support') }, '💜 Reassurance and support'));
   openSheet('What’s happening?', body);
 }
 function showAnswer(it) {
