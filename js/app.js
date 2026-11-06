@@ -1,7 +1,7 @@
 import { SECTIONS, PRAISE, GROUP_DONE, PET_LINES, OVERWHELM, isCheck } from './data.js';
 import * as store from './storage.js';
 import * as sfx from './audio.js';
-import { askCat, offlineReply } from './ai.js';
+import { askCat, offlineReply, status as aiStatus, CONNECTOR } from './ai.js';
 
 // ═════════════════════════ helpers ═════════════════════════
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -35,7 +35,7 @@ const SVG = {};
 async function loadAssets() {
   const names = ['cloud-cat', 'running-cat', 'scene-suitcase', 'scene-train', 'scene-airport', 'star'];
   await Promise.all(names.map(async (n) => {
-    try { SVG[n] = await (await fetch(`assets/${n}.svg`)).text(); } catch { SVG[n] = '<svg xmlns="http://www.w3.org/2000/svg"/>'; }
+    try { SVG[n] = window.__INLINE_SVG?.[n] ?? await (await fetch(`assets/${n}.svg`)).text(); } catch { SVG[n] = '<svg xmlns="http://www.w3.org/2000/svg"/>'; }
   }));
   // Star → reusable <symbol>, recoloured with currentColor.
   const doc = new DOMParser().parseFromString(SVG.star, 'image/svg+xml').documentElement;
@@ -506,13 +506,13 @@ function viewWallet() {
   const grid = h('div', { class: 'tickets' });
   for (const f of state.files) {
     const thumb = h('div', { class: 'thumb' }, f.type.startsWith('image/') ? '' : '📄');
-    if (f.type.startsWith('image/')) store.getFile(f.id).then((blob) => { if (!blob) return; const u = URL.createObjectURL(blob); objectUrls.push(u); thumb.append(h('img', { src: u, alt: '' })); });
+    if (f.type.startsWith('image/')) store.getFile(f.id).catch(() => null).then((blob) => { if (!blob) return; const u = URL.createObjectURL(blob); objectUrls.push(u); thumb.append(h('img', { src: u, alt: '' })); });
     grid.append(h('div', { class: 'ticket' },
       h('button', { onclick: () => openFile(f), 'aria-label': `Open ${f.label}` }, thumb),
       h('div', { class: 'tl' }, h('input', { type: 'text', value: f.label, 'aria-label': 'Ticket name', oninput: (e) => { f.label = e.target.value; save(); } })),
       h('div', { class: 'tact' },
         h('button', { class: 'link', onclick: () => openFile(f) }, 'Open'),
-        h('button', { class: 'link', onclick: () => confirmSheet(`Remove “${f.label}”?`, 'Remove', async () => { await store.delFile(f.id); state.files = state.files.filter((x) => x !== f); save(); renderView(); }) }, 'Remove'))));
+        h('button', { class: 'link', onclick: () => confirmSheet(`Remove “${f.label}”?`, 'Remove', async () => { await store.delFile(f.id).catch(() => {}); state.files = state.files.filter((x) => x !== f); save(); renderView(); }) }, 'Remove'))));
   }
   const input = h('input', { type: 'file', accept: 'image/*,application/pdf', hidden: true, onchange: async (e) => {
     const file = e.target.files?.[0]; if (!file) return;
@@ -547,8 +547,8 @@ function viewWallet() {
   ];
 }
 async function openFile(f) {
-  const blob = await store.getFile(f.id);
-  if (!blob) return toast('That file is missing, sorry.');
+  const blob = await store.getFile(f.id).catch(() => null);
+  if (!blob) return toast('That file couldn’t be opened. Try adding it again.');
   const url = URL.createObjectURL(blob);
   const body = f.type.startsWith('image/') ? h('img', { src: url, alt: f.label }) : h('iframe', { src: url, title: f.label });
   const v = h('div', { class: 'viewer', role: 'dialog', 'aria-label': f.label },
@@ -587,22 +587,25 @@ function viewSettings() {
     h('div', { class: 'card' },
       h('b', {}, 'Look & feel'),
       tog('reduceMotion', 'Reduce motion'), tog('countdowns', 'Show countdowns on travel days'),
-      h('label', { class: 'field' }, h('span', {}, 'Theme')), seg('theme', [['day', '☁️ Day sky'], ['night', '🌙 Night sky']]),
+      h('label', { class: 'field' }, h('span', {}, 'Theme')), seg('theme', [['auto', '📱 Match phone'], ['day', '☁️ Day sky'], ['night', '🌙 Night sky']]),
       h('label', { class: 'field' }, h('span', {}, 'Text size')), seg('textSize', [[0.9, 'A−'], [1, 'A'], [1.15, 'A+'], [1.3, 'A++']])),
     h('div', { class: 'card' },
       h('b', {}, '💜 AI helper'),
-      h('p', { class: 'muted', style: { fontSize: '.9rem' } }, 'Where the app reaches your GPT helper. Leave as /api/chat if you use the included server.'),
-      h('label', { class: 'field' }, h('span', {}, 'Helper address'), h('input', { type: 'url', value: st.aiUrl, oninput: (e) => { st.aiUrl = e.target.value.trim(); save(); } })),
-      h('label', { class: 'field' }, h('span', {}, 'Passcode'), h('input', { type: 'password', value: st.aiPass, oninput: (e) => { st.aiPass = e.target.value; save(); } })),
+      h('p', { class: 'muted', style: { fontSize: '.9rem' } }, window.__ARTIFACT ? `On this page the cat talks through your ChatGPT API using the “${CONNECTOR}” connector. Until that connector is added in claude.ai Settings → Connectors, Claude answers instead.` : 'Where the app reaches your GPT helper. Leave as /api/chat if you use the included server.'),
+      window.__ARTIFACT ? null : h('label', { class: 'field' }, h('span', {}, 'Helper address'), h('input', { type: 'url', value: st.aiUrl, oninput: (e) => { st.aiUrl = e.target.value.trim(); save(); } })),
+      window.__ARTIFACT ? null : h('label', { class: 'field' }, h('span', {}, 'Passcode'), h('input', { type: 'password', value: st.aiPass, oninput: (e) => { st.aiPass = e.target.value; save(); } })),
       h('button', { class: 'btn small soft', onclick: async (e) => {
         e.target.textContent = 'Checking…';
-        try { await askCat([{ role: 'user', content: 'Say hi in five words.' }], buildContext(), st); e.target.textContent = 'Connected ✓'; } catch (err) { e.target.textContent = `Couldn’t connect (${err.message})`; }
+        try {
+          await askCat([{ role: 'user', content: 'Say hi in five words.' }], buildContext(), st);
+          e.target.textContent = !window.__ARTIFACT ? 'Connected ✓' : aiStatus.route === 'gpt' ? 'ChatGPT connected ✓' : `Claude answered (ChatGPT connector: ${aiStatus.reason || 'not set up'})`;
+        } catch (err) { e.target.textContent = `Couldn’t connect (${err.message})`; }
       } }, 'Test connection')),
     h('div', { class: 'card' },
       h('b', {}, 'Backup'),
-      h('p', { class: 'muted', style: { fontSize: '.9rem' } }, 'Progress saves by itself. A backup file is extra safety (tickets aren’t included).'),
+      h('p', { class: 'muted', style: { fontSize: '.9rem' } }, window.__ARTIFACT ? 'Progress saves by itself in this browser.' : 'Progress saves by itself. A backup file is extra safety (tickets aren’t included).'),
       h('div', { class: 'mini-actions' },
-        h('button', { class: 'btn small soft', onclick: exportBackup }, '⬇️ Save backup'),
+        window.__ARTIFACT ? null : h('button', { class: 'btn small soft', onclick: exportBackup }, '⬇️ Save backup'),
         h('button', { class: 'btn small soft', onclick: importBackup }, '⬆️ Load backup'))),
     h('div', { class: 'card' },
       h('b', {}, 'Start again'),
@@ -636,10 +639,11 @@ function importBackup() {
 function applySettings() {
   const st = state.settings;
   sfx.configure(st);
-  document.documentElement.dataset.theme = st.theme;
+  if (st.theme === 'day' || st.theme === 'night') document.documentElement.dataset.sky = st.theme;
+  else delete document.documentElement.dataset.sky;
   document.documentElement.style.setProperty('--fs', st.textSize);
   document.body.classList.toggle('reduce-motion', !!st.reduceMotion);
-  $('meta[name="theme-color"]').setAttribute('content', st.theme === 'night' ? '#2A2150' : '#EDE6FF');
+  $('meta[name="theme-color"]')?.setAttribute('content', st.theme === 'night' ? '#2A2150' : '#EDE6FF');
 }
 
 // ═════════════════════════ overlays ═════════════════════════
@@ -876,7 +880,7 @@ async function boot() {
   }, 30000);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') store.saveNow(state); });
   store.persist();
-  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+  if (!window.__ARTIFACT && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 }

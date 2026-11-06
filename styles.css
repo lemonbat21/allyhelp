@@ -11,6 +11,8 @@
   --line: #E3D9FA;
   --lav: #C9B8F5;
   --purple: #7B5CC4;
+  --on-purple: #FFFFFF;
+  --purple-press: #5B3FA0;
   --mint: #BDEBD8;
   --mint-deep: #54B78E;
   --calm: #EEE6FF;
@@ -18,6 +20,7 @@
   --info-ink: #3F5C99;
   --if: #FFEDE6;
   --if-ink: #9A4F3A;
+  --puff: .55;
   --shadow: 0 6px 18px rgba(86, 64, 150, .12);
   --press: 0 4px 0 #D9CCF6;
   --radius: 22px;
@@ -25,7 +28,37 @@
   --run-dur: .7s;
   color-scheme: light;
 }
-:root[data-theme="night"] {
+/* Follows the phone's light/dark setting. Settings can force it with data-sky="day" or "night". */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-sky="day"]) {
+    --bg: #1C1733;
+    --sky-top: #2A2150;
+    --sky-bot: #1F1939;
+    --ink: #F1EBFF;
+    --ink-soft: #C8BBEB;
+    --ink-faint: #8E80B8;
+    --card: #2A2346;
+    --card-2: #332A55;
+    --line: #3F3466;
+    --lav: #6E5AA8;
+    --purple: #B49CF5;
+    --on-purple: #1C1733;
+    --purple-press: #6E58B0;
+    --mint: #2F6B57;
+    --mint-deep: #7DDBB4;
+    --calm: #352C5C;
+    --info: #26345A;
+    --info-ink: #BFD3FF;
+    --if: #4A2E33;
+    --if-ink: #FFC9B8;
+    --puff: .08;
+    --shadow: 0 6px 18px rgba(0, 0, 0, .35);
+    --press: 0 4px 0 #151127;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]:not([data-sky="day"]),
+:root[data-sky="night"] {
   --bg: #1C1733;
   --sky-top: #2A2150;
   --sky-bot: #1F1939;
@@ -37,6 +70,8 @@
   --line: #3F3466;
   --lav: #6E5AA8;
   --purple: #B49CF5;
+  --on-purple: #1C1733;
+  --purple-press: #6E58B0;
   --mint: #2F6B57;
   --mint-deep: #7DDBB4;
   --calm: #352C5C;
@@ -44,6 +79,7 @@
   --info-ink: #BFD3FF;
   --if: #4A2E33;
   --if-ink: #FFC9B8;
+  --puff: .08;
   --shadow: 0 6px 18px rgba(0, 0, 0, .35);
   --press: 0 4px 0 #151127;
   color-scheme: dark;
@@ -68,8 +104,7 @@ button { cursor: pointer; border: 0; background: none; padding: 0; }
   border-radius: 0 0 32px 32px;
   padding-top: env(safe-area-inset-top);
 }
-.sky-clouds .puff { position: absolute; background: #fff; opacity: .55; border-radius: 999px; filter: blur(1px); }
-:root[data-theme="night"] .sky-clouds .puff { opacity: .08; }
+.sky-clouds .puff { position: absolute; background: #fff; opacity: var(--puff); border-radius: 999px; filter: blur(1px); }
 .puff.p1 { width: 120px; height: 38px; left: -30px; top: 120px; animation: drift 26s ease-in-out infinite alternate; }
 .puff.p2 { width: 90px; height: 30px; right: -20px; top: 70px; animation: drift 32s ease-in-out infinite alternate-reverse; }
 .puff.p3 { width: 70px; height: 24px; left: 40%; top: 150px; opacity: .35; animation: drift 40s ease-in-out infinite alternate; }
@@ -120,7 +155,7 @@ button { cursor: pointer; border: 0; background: none; padding: 0; }
 .bubble.show { opacity: 1; transform: scale(1); }
 
 /* ───────── Progress ───────── */
-.progress-wrap { position: relative; margin: 14px 18px 4px; padding-top: 34px; }
+.progress-wrap { position: relative; margin: 14px max(18px, env(safe-area-inset-right, 0px)) 4px max(18px, env(safe-area-inset-left, 0px)); padding-top: 34px; }
 .progress { height: 16px; border-radius: 999px; background: var(--card); box-shadow: inset 0 2px 4px rgba(80, 60, 140, .12); overflow: hidden; margin-right: 46px; }
 .fill {
   height: 100%; width: 0; border-radius: 999px;
@@ -147,7 +182,7 @@ button { cursor: pointer; border: 0; background: none; padding: 0; }
 @keyframes dust { 0% { opacity: .7; transform: translate(0, 0) scale(.6); } 100% { opacity: 0; transform: translate(-14px, -4px) scale(1.4); } }
 
 /* ───────── Generic cards / buttons ───────── */
-main { padding: 8px 16px 24px; outline: none; }
+main { padding-block: 8px 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); outline: none; }
 .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin: 12px 0; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 10px 18px;
@@ -155,8 +190,7 @@ main { padding: 8px 16px 24px; outline: none; }
   transition: transform .12s, box-shadow .12s;
 }
 .btn:active { transform: translateY(3px) scale(.98); box-shadow: 0 1px 0 var(--line); }
-.btn.primary { background: var(--purple); color: #fff; box-shadow: 0 4px 0 #5B3FA0, var(--shadow); }
-:root[data-theme="night"] .btn.primary { color: #1C1733; box-shadow: 0 4px 0 #6E58B0, var(--shadow); }
+.btn.primary { background: var(--purple); color: var(--on-purple); box-shadow: 0 4px 0 var(--purple-press), var(--shadow); }
 .btn.soft { background: var(--card-2); box-shadow: 0 3px 0 var(--line); }
 .btn.small { min-height: 40px; padding: 6px 14px; font-size: .9rem; border-radius: 13px; }
 .btn.block { width: 100%; }
@@ -259,7 +293,7 @@ main { padding: 8px 16px 24px; outline: none; }
 .parts button.on { background: var(--card); color: var(--ink); box-shadow: 0 2px 0 var(--line); }
 
 .calm-pill {
-  position: fixed; z-index: 20; right: max(16px, calc(50% - 244px)); bottom: calc(96px + env(safe-area-inset-bottom));
+  position: fixed; z-index: 20; right: max(16px, calc(50% - 244px), env(safe-area-inset-right, 0px)); bottom: calc(96px + env(safe-area-inset-bottom, 0px));
   padding: 10px 16px; border-radius: 999px; background: #B79CF2; color: #2A1E4D; font-weight: 900; box-shadow: 0 4px 0 #8E70D6, var(--shadow);
 }
 .calm-pill:active { transform: translateY(3px); box-shadow: 0 1px 0 #8E70D6; }
@@ -273,7 +307,7 @@ main { padding: 8px 16px 24px; outline: none; }
 /* ───────── Tab bar ───────── */
 .tabbar {
   position: fixed; z-index: 30; left: 50%; transform: translateX(-50%); bottom: 0; width: min(520px, 100%);
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 8px max(10px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left, 0px));
   background: color-mix(in srgb, var(--card) 92%, transparent); backdrop-filter: blur(10px);
   border-radius: 24px 24px 0 0; box-shadow: 0 -4px 20px rgba(86, 64, 150, .1);
 }
@@ -321,8 +355,7 @@ main { padding: 8px 16px 24px; outline: none; }
 
 .chat { flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding: 6px 2px 10px; }
 .msg { max-width: 86%; padding: 10px 14px; border-radius: 18px; line-height: 1.4; white-space: pre-wrap; animation: pop-in .3s both; }
-.msg.user { align-self: flex-end; background: var(--purple); color: #fff; border-bottom-right-radius: 6px; }
-:root[data-theme="night"] .msg.user { color: #1C1733; }
+.msg.user { align-self: flex-end; background: var(--purple); color: var(--on-purple); border-bottom-right-radius: 6px; }
 .msg.assistant { align-self: flex-start; background: var(--card); box-shadow: var(--shadow); border-bottom-left-radius: 6px; }
 .msg.assistant::before { content: '🐱 '; }
 .typing span { display: inline-block; width: 7px; height: 7px; margin: 0 2px; border-radius: 50%; background: var(--ink-faint); animation: dots 1s infinite; }
@@ -354,8 +387,7 @@ input[type="text"], input[type="tel"], input[type="url"], input[type="password"]
 input:focus, textarea:focus, select:focus { border-color: var(--lav); }
 .seg { display: flex; flex-wrap: wrap; gap: 6px; }
 .seg button { padding: 10px 14px; border-radius: 12px; background: var(--card-2); font-weight: 800; box-shadow: 0 2px 0 var(--line); min-height: 44px; }
-.seg button.on { background: var(--purple); color: #fff; box-shadow: 0 2px 0 #5B3FA0; }
-:root[data-theme="night"] .seg button.on { color: #1C1733; }
+.seg button.on { background: var(--purple); color: var(--on-purple); box-shadow: 0 2px 0 var(--purple-press); }
 .toggle { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-weight: 800; min-height: 48px; }
 .switch { width: 54px; height: 32px; border-radius: 999px; background: var(--line); position: relative; transition: background .2s; flex: 0 0 auto; }
 .switch::after { content: ''; position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, .15); transition: transform .25s cubic-bezier(.3, 1.4, .5, 1); }

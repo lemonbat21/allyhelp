@@ -1,6 +1,56 @@
-// Talks to the private helper (server/worker.js or server/dev-server.mjs), which talks to OpenAI.
+// The cat's helper. Routes, in order:
+//  • On a claude.ai page: your ChatGPT API through the "Cloud Cat GPT" custom connector
+//    (server/worker.js, tool `ask_cat`). If that connector isn't added yet, Claude answers instead
+//    (the `sample` capability) so the chat never goes silent.
+//  • Anywhere else: the private GPT helper (server/worker.js or server/dev-server.mjs) at /api/chat.
+import { SYSTEM_PROMPT } from './persona.js';
+
+export const CONNECTOR = 'Cloud Cat GPT';
+export const CONNECTOR_TOOL = 'ask_cat';
+
+const caps = {}; // name -> namespace | null
+async function cap(name) {
+  if (!(name in caps)) caps[name] = window.claude?.use ? await window.claude.use(name).catch(() => null) : null;
+  return caps[name];
+}
+
+// Remembers why GPT wasn't used, so Settings can explain it.
+export const status = { route: null, reason: null };
+
+async function viaConnector(messages, context) {
+  const mcp = await cap('mcp');
+  if (!mcp) { status.reason = 'not_available'; return null; }
+  try {
+    const res = await mcp.callTool(CONNECTOR, CONNECTOR_TOOL, { messages: messages.slice(-16), context }, { cache: false });
+    const reply = res?.payload?.reply ?? (typeof res?.payload === 'string' ? res.payload : null);
+    if (!reply) { status.reason = 'empty_reply'; return null; }
+    status.route = 'gpt'; status.reason = null;
+    return String(reply).trim();
+  } catch (e) {
+    status.reason = e?.code || 'upstream_error'; // server_not_connected, needs_reauth, not_in_manifest, tool_error…
+    return null;
+  }
+}
+
 export async function askCat(messages, context, settings) {
   if (!navigator.onLine) throw new Error('offline');
+  if (window.__ARTIFACT) {
+    const gpt = await viaConnector(messages, context);
+    if (gpt) return gpt;
+  }
+  const sample = await cap('sample');
+  if (sample) {
+    const rules = `${SYSTEM_PROMPT}\n\nCONTEXT (from the app, not from the user):\n${JSON.stringify(context)}\n\nReply only with your message to the traveller.`;
+    const turns = messages.filter((m) => m.content && (m.role === 'user' || m.role === 'assistant')).slice(-16);
+    while (turns.length && turns[0].role !== 'user') turns.shift();
+    try {
+      const { text } = await sample([{ role: 'user', content: rules }, ...turns], { cache: false, modelTier: 'quick' });
+      status.route = 'claude';
+      return text.trim();
+    } catch (e) {
+      throw new Error(e?.code || 'claude_error');
+    }
+  }
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 60000);
   try {

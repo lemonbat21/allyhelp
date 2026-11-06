@@ -9,3 +9,4 @@ OPENAI_MODEL = "gpt-5.5"
 # Secrets (never put these in this file):
 #   npx wrangler secret put OPENAI_API_KEY
 #   npx wrangler secret put APP_PASSCODE
+#   npx wrangler secret put MCP_SECRET   (the custom-connector URL is /mcp/<MCP_SECRET>)
