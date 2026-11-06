@@ -612,6 +612,7 @@ function viewSettings() {
     h('div', { class: 'card' },
       h('b', {}, 'Look & feel'),
       tog('reduceMotion', 'Reduce motion'), tog('countdowns', 'Show countdowns on travel days'),
+      h('label', { class: 'field' }, h('span', {}, 'Theme')), seg('theme', [['day', '☁️ Day'], ['night', '🌙 Night']]),
       h('label', { class: 'field' }, h('span', {}, 'Text size')), seg('textSize', [[0.9, 'A−'], [1, 'A'], [1.15, 'A+'], [1.3, 'A++']])),
     h('div', { class: 'card' },
       h('b', {}, '💜 AI helper'),
@@ -663,6 +664,7 @@ function importBackup() {
 function applySettings() {
   const st = state.settings;
   sfx.configure(st);
+  if (st.theme === 'night') document.documentElement.dataset.sky = 'night'; else delete document.documentElement.dataset.sky;
   document.documentElement.style.setProperty('--fs', st.textSize);
   document.body.classList.toggle('reduce-motion', !!st.reduceMotion);
   
@@ -885,6 +887,13 @@ async function boot() {
   $('#cloudcat').append(catSvg);
   const runner = svgEl('running-cat');
   $('#runner').append(runner, h('span', { class: 'dust' }));
+  const trot = () => {
+    const r = $('#runner');
+    if (state.settings.reduceMotion || document.hidden) r.dataset.pose = '';
+    else r.dataset.pose = r.dataset.pose === 'a' ? 'b' : 'a';
+    setTimeout(trot, r.classList.contains('sprint') ? 110 : 380);
+  };
+  trot();
   $('#cloudcat').addEventListener('click', openCatMenu);
   document.querySelectorAll('.tabbar button').forEach((b) => b.addEventListener('click', () => { sfx.softTap(); go(b.dataset.tab); }));
   document.addEventListener('keydown', (e) => {

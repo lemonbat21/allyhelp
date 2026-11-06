@@ -34,7 +34,7 @@ def wrap_module(name: str) -> str:
 def main():
     css = (ROOT / "styles.css").read_text()
     # claude.ai already pads the page for the phone's top inset.
-    css += "\n/* claude.ai page */\n.sky { padding-top: 0; }\n.cloudcat { top: 36px; }\n.bubble { top: 46px; }\n"
+    css += "\n/* claude.ai page */\n.sky { padding-top: 0; }\n.cloudcat { top: 36px; animation-name: float-artifact; }\n@keyframes float-artifact { 0%, 100% { top: 36px; } 50% { top: 29px; } }\n.bubble { top: 46px; }\n"
 
     html = (ROOT / "index.html").read_text()
     body = html[html.index("<body>") + len("<body>"): html.index("</body>")]

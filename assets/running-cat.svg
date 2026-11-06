@@ -23,11 +23,13 @@
     <path d="M76 45L80 46M76 50L80 49" stroke-width="2"/>
   </g>
   <g id="leg-bl">
-    <path d="M30 55H43V73C43 77 40.5 79 36.5 79C32.5 79 30 77 30 73Z" fill="#E9E3F5"/>
+    <path d="M30 50H43V73C43 77 40.5 79 36.5 79C32.5 79 30 77 30 73Z" fill="#E9E3F5" stroke="none"/>
+    <path d="M30 63V73C30 77 32.5 79 36.5 79C40.5 79 43 77 43 73V65"/>
     <path d="M34 74V77" stroke-width="1.8"/>
   </g>
   <g id="leg-fl">
-    <path d="M71 55H84V73C84 77 81.5 79 77.5 79C73.5 79 71 77 71 73Z" fill="#E9E3F5"/>
+    <path d="M71 50H84V73C84 77 81.5 79 77.5 79C73.5 79 71 77 71 73Z" fill="#E9E3F5" stroke="none"/>
+    <path d="M71 66V73C71 77 73.5 79 77.5 79C81.5 79 84 77 84 73V63.5"/>
     <path d="M75 74V77" stroke-width="1.8"/>
   </g>
 </svg>

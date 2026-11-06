@@ -11,6 +11,7 @@ export const DEFAULT_SETTINGS = {
   name: 'baby',
   countdowns: false,
   textSize: 1,              // 0.9 – 1.3
+  theme: 'day',             // day | night
   aiUrl: '/api/chat',
   aiPass: '',
 };
