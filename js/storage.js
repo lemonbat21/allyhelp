@@ -11,7 +11,6 @@ export const DEFAULT_SETTINGS = {
   name: 'baby',
   countdowns: false,
   textSize: 1,              // 0.9 – 1.3
-  theme: 'auto',            // auto (follow phone) | day | night
   aiUrl: '/api/chat',
   aiPass: '',
 };

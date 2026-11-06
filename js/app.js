@@ -270,8 +270,8 @@ function viewToday() {
     out.push(viewTimes(part));
     const g = currentStage(s, part);
     if (g) {
-      out.push(...viewGroup(s, part, g, true));
       out.push(h('button', { class: 'calm-pill', onclick: openOverwhelm }, '💜 I’m overwhelmed'));
+      out.push(...viewGroup(s, part, g, true));
     } else out.push(viewDoneCard(s, groupsOf(s, part.id)));
   }
   return out;
@@ -612,7 +612,6 @@ function viewSettings() {
     h('div', { class: 'card' },
       h('b', {}, 'Look & feel'),
       tog('reduceMotion', 'Reduce motion'), tog('countdowns', 'Show countdowns on travel days'),
-      h('label', { class: 'field' }, h('span', {}, 'Theme')), seg('theme', [['auto', '📱 Match phone'], ['day', '☁️ Day sky'], ['night', '🌙 Night sky']]),
       h('label', { class: 'field' }, h('span', {}, 'Text size')), seg('textSize', [[0.9, 'A−'], [1, 'A'], [1.15, 'A+'], [1.3, 'A++']])),
     h('div', { class: 'card' },
       h('b', {}, '💜 AI helper'),
@@ -664,11 +663,9 @@ function importBackup() {
 function applySettings() {
   const st = state.settings;
   sfx.configure(st);
-  if (st.theme === 'day' || st.theme === 'night') document.documentElement.dataset.sky = st.theme;
-  else delete document.documentElement.dataset.sky;
   document.documentElement.style.setProperty('--fs', st.textSize);
   document.body.classList.toggle('reduce-motion', !!st.reduceMotion);
-  $('meta[name="theme-color"]')?.setAttribute('content', st.theme === 'night' ? '#2A2150' : '#EDE6FF');
+  
 }
 
 // ═════════════════════════ overlays ═════════════════════════
