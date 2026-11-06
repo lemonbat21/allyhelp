@@ -1,7 +1,7 @@
 import { SECTIONS, PRAISE, GROUP_DONE, PET_LINES, OVERWHELM, isCheck } from './data.js';
 import * as store from './storage.js';
 import * as sfx from './audio.js';
-import { askCat, offlineReply, status as aiStatus, CONNECTOR } from './ai.js';
+import { askCat, offlineReply } from './ai.js';
 
 // ═════════════════════════ helpers ═════════════════════════
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -39,9 +39,14 @@ const ICON_FOR = {
 };
 const SECTION_ICON = { prep: 'calendar', flight: 'plane', home: 'return' };
 const TAB_ICON = { today: 'house', finished: 'star', wallet: 'ticket', settings: 'gear' };
+// One-colour icons: the PNG is only used as a shape (mask), the colour comes from the theme.
 function icon(name, cls = '') {
   if (!name) return null;
-  return h('img', { class: `ic ${cls}`.trim(), src: window.__INLINE_ICONS?.[name] ?? `assets/icons/${name}.png`, alt: '', 'aria-hidden': 'true', draggable: 'false' });
+  const src = window.__INLINE_ICONS?.[name] ?? `assets/icons/${name}.png`;
+  const el = h('span', { class: `ic ${cls}`.trim(), 'aria-hidden': 'true' });
+  el.style.setProperty('-webkit-mask-image', `url("${src}")`);
+  el.style.setProperty('mask-image', `url("${src}")`);
+  return el;
 }
 const gi = (g, cls) => (ICON_FOR[g.icon] ? icon(ICON_FOR[g.icon], cls) : g.icon);
 
@@ -630,14 +635,14 @@ function viewSettings() {
       h('label', { class: 'field' }, h('span', {}, 'Text size')), seg('textSize', [[0.9, 'A−'], [1, 'A'], [1.15, 'A+'], [1.3, 'A++']])),
     h('div', { class: 'card' },
       h('b', {}, '💜 AI helper'),
-      h('p', { class: 'muted', style: { fontSize: '.9rem' } }, window.__ARTIFACT ? `On this page the cat talks through your ChatGPT API using the “${CONNECTOR}” connector. Until that connector is added in claude.ai Settings → Connectors, Claude answers instead.` : 'Where the app reaches your GPT helper. Leave as /api/chat if you use the included server.'),
+      h('p', { class: 'muted', style: { fontSize: '.9rem' } }, window.__ARTIFACT ? 'The cat talks using your own Claude (medium thinking). The first time, Claude asks you to allow it.' : 'Where the app reaches your GPT helper. Leave as /api/chat if you use the included server.'),
       window.__ARTIFACT ? null : h('label', { class: 'field' }, h('span', {}, 'Helper address'), h('input', { type: 'url', value: st.aiUrl, oninput: (e) => { st.aiUrl = e.target.value.trim(); save(); } })),
       window.__ARTIFACT ? null : h('label', { class: 'field' }, h('span', {}, 'Passcode'), h('input', { type: 'password', value: st.aiPass, oninput: (e) => { st.aiPass = e.target.value; save(); } })),
       h('button', { class: 'btn small soft', onclick: async (e) => {
         e.target.textContent = 'Checking…';
         try {
           await askCat([{ role: 'user', content: 'Say hi in five words.' }], buildContext(), st);
-          e.target.textContent = !window.__ARTIFACT ? 'Connected ✓' : aiStatus.route === 'gpt' ? 'ChatGPT connected ✓' : `Claude answered (ChatGPT connector: ${aiStatus.reason || 'not set up'})`;
+          e.target.textContent = 'Connected ✓';
         } catch (err) { e.target.textContent = `Couldn’t connect (${err.message})`; }
       } }, 'Test connection')),
     h('div', { class: 'card' },
@@ -797,14 +802,17 @@ function showAnswer(it) {
 }
 function openOverwhelm() {
   sfx.unlock(); sfx.softTap();
-  const node = h('div', { class: 'card', style: { width: 'min(440px, calc(100% - 32px))', textAlign: 'center' }, role: 'dialog', 'aria-label': 'Overwhelmed' },
-    h('div', { class: 'breathe', 'aria-hidden': 'true' }, h('span', {}, 'breathe')),
-    h('p', { class: 'answer', style: { fontSize: '1.1rem' } }, OVERWHELM.a),
-    sayCard(OVERWHELM.say),
-    h('p', { class: 'muted', style: { marginTop: '14px' } }, nextStepText() ? `When you’re ready, the next step is: ${nextStepText()}` : ''),
-    h('div', { class: 'mini-actions', style: { justifyContent: 'center' } },
-      h('button', { class: 'btn soft', onclick: closeOverlay }, 'I’m okay now'),
-      h('button', { class: 'btn primary', onclick: () => openChat('support') }, '💜 Talk to me')));
+  const jan = (state.info.jan || '').trim();
+  const node = h('div', { class: 'card calm-card', role: 'dialog', 'aria-label': 'Overwhelmed' },
+    h('button', { class: 'x calm-x', 'aria-label': 'Close', onclick: closeOverlay }, '✕'),
+    h('div', { class: 'breathe', 'aria-hidden': 'true' }),
+    h('p', { class: 'calm-line' }, 'Find somewhere to sit.'),
+    h('div', { class: 'calm-actions' },
+      jan
+        ? h('a', { class: 'btn soft', href: `sms:${jan.replace(/[^\d+]/g, '')}` }, '💬 Text Jan')
+        : h('button', { class: 'btn soft', onclick: () => { closeOverlay(); go('wallet'); toast('Add Jan’s number here'); } }, '💬 Text Jan'),
+      h('button', { class: 'btn primary', onclick: () => openChat('support') }, '💜 Chat with me')),
+    jan ? h('p', { class: 'calm-num' }, `Jan: ${jan}`) : null);
   openOverlay(node, 'center');
 }
 

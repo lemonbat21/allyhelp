@@ -36,37 +36,28 @@ Rebuild it after changing anything:
 python3 tools/build_artifact.py
 ```
 
-On that page the cat's chat uses **your ChatGPT API through a custom connector**.
-Until you add the connector, Claude answers instead, so the chat always works.
+On that page the cat's chat uses **the viewer's own Claude** (medium reasoning). Nothing to set up:
+the first time, Claude asks to allow it.
 
-**Set up the "Cloud Cat GPT" connector (one time):**
-
-1. Deploy the worker (free Cloudflare account):
-   ```bash
-   cd server
-   npx wrangler deploy
-   npx wrangler secret put OPENAI_API_KEY
-   npx wrangler secret put MCP_SECRET
-   ```
-   For `MCP_SECRET`, type any long random text (for example 30 letters and numbers). Keep it private:
-   anyone with the full connector address could use your OpenAI key.
-2. In claude.ai, go to **Settings → Connectors → Add custom connector**.
-   - Name: **Cloud Cat GPT** (exactly this, the page looks for this name)
-   - URL: `https://cloud-cat-helper.<your-workers-subdomain>.workers.dev/mcp/<your MCP_SECRET>`
-3. Open the page, tap the cat → **Help** → **💜 Reassurance and support**, and allow the connector when asked.
-   In **Settings → AI helper**, **Test connection** should say "ChatGPT connected ✓".
+(`server/worker.js` also exposes an MCP endpoint, `/mcp/<MCP_SECRET>`, with an `ask_cat` tool, in case you
+ever want to route the chat through your OpenAI key as a custom connector instead.)
 
 ### B. GitHub Pages
 
 Repo **Settings → Pages → Deploy from branch** → pick this branch and `/ (root)`.
 
-The AI helper there needs the same worker (step 1 above, plus `npx wrangler secret put APP_PASSCODE`).
+The AI helper there uses your OpenAI key through the worker: `cd server`, `npx wrangler deploy`, then
+`npx wrangler secret put OPENAI_API_KEY` and `npx wrangler secret put APP_PASSCODE`.
 In the app, go to **Settings → AI helper**, paste the worker address (`https://cloud-cat-helper.<you>.workers.dev/api/chat`)
 and the passcode, then tap **Test connection**.
 
 On iPhone, open the site in Safari, tap **Share → Add to Home Screen**, and open it once while online so it's saved for offline use.
 
 ## Artwork
+
+Icons (`assets/icons/`) are one-colour glyphs made with `gpt-image-2.6-flare` (medium) by
+`tools/generate_icons.py`; the app tints them to the theme colour.
+
 
 The SVG illustrations in `assets/` were generated with OpenAI `gpt-6.1-sol` using the reference screenshots in
 `tools/reference/`. To regenerate one you don't like:

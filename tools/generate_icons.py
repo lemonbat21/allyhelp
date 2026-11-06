@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Generate the app's little pastel icons with OpenAI gpt-image-2.6-sunburst (quality: low).
+"""Generate the app's little icons with OpenAI gpt-image-2.6-flare (quality: medium).
 
     OPENAI_API_KEY=sk-... python3 tools/generate_icons.py           # all icons
     OPENAI_API_KEY=sk-... python3 tools/generate_icons.py train bed # just some
 
-Each icon is generated on a plain white background, then the background is cut
-out, trimmed, and saved as a 128x128 transparent PNG in assets/icons/.
+Each icon is a single-colour glyph generated on white. The darkness of each pixel
+becomes its opacity, so the result is one flat colour with smooth edges; the app
+tints it to the theme colour. Saved as 128x128 transparent PNGs in assets/icons/.
 """
 import base64
 import concurrent.futures as cf
@@ -16,20 +17,22 @@ import sys
 import urllib.request
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets" / "icons"
-MODEL = os.environ.get("ICON_MODEL", "gpt-image-2.6-sunburst")
+MODEL = os.environ.get("ICON_MODEL", "gpt-image-2.6-flare")
+QUALITY = os.environ.get("ICON_QUALITY", "medium")
+COLOUR = (123, 92, 196)  # #7B5CC4
 KEY = os.environ.get("OPENAI_API_KEY", "proxy-injected")
 
 STYLE = (
-    "A single cute, simplified app icon of {subject}. "
-    "Soft pastel colours only: lavender #C9B8F5, mint #BDEBD8, baby pink #F9B9CF, peach #FFCFAE, "
-    "butter yellow #FFE6A3, sky blue #BFDCFF, with a slightly deeper shade of the same pastel for small details. "
-    "Smooth, chunky, rounded shapes with fully rounded corners, very minimal detail, flat colour. "
-    "No outlines, no text, no letters, no shadow, no glow, no gradient, no background shape. "
-    "Centred with generous empty space around it, on a plain solid pure white background."
+    "A simple flat glyph icon of {subject}. "
+    "One single solid colour only: a filled purple (#7B5CC4) silhouette on a plain pure white background. "
+    "Bold, chunky, rounded shapes with fully rounded corners and thick parts, very minimal detail, "
+    "designed to be instantly readable at 24 pixels. Small details are cut out as white gaps, never drawn in another colour. "
+    "No face, no eyes, no mouth, no text, no letters, no outline in another colour, no shading, no gradient, no shadow. "
+    "Centred with generous empty space around it."
 )
 
 ICONS = {
@@ -39,7 +42,7 @@ ICONS = {
     "camera": "a compact photo camera",
     "passport": "a passport booklet with a simple globe on the cover",
     "backpack": "a small backpack",
-    "bath": "a bathtub with a few bubbles",
+    "bath": "a bathtub with a shower head",
     "paw": "a cat paw print",
     "bed": "a bed with a pillow and blanket, side view",
     "broom": "a broom",
@@ -52,7 +55,7 @@ ICONS = {
     "landing": "an airplane landing, tilted down toward a short runway line",
     "alarm": "a round alarm clock with two bells",
     "house": "a cosy little house",
-    "star": "a five-pointed star",
+    "star": "a five-pointed star with rounded points",
     "ticket": "a travel ticket with a notch on each side",
     "gear": "a settings gear cog",
     "calendar": "a desk calendar page",
@@ -63,7 +66,7 @@ ICONS = {
 def generate(name: str) -> bytes:
     body = json.dumps({
         "model": MODEL, "prompt": STYLE.format(subject=ICONS[name]),
-        "quality": "low", "size": "1024x1024", "background": "opaque", "output_format": "png", "n": 1,
+        "quality": QUALITY, "size": "1024x1024", "background": "opaque", "output_format": "png", "n": 1,
     }).encode()
     req = urllib.request.Request("https://api.openai.com/v1/images/generations", data=body, headers={
         "Authorization": f"Bearer {KEY}", "Content-Type": "application/json"})
@@ -73,37 +76,20 @@ def generate(name: str) -> bytes:
 
 
 def cut_out(png: bytes) -> Image.Image:
-    """Remove the white background connected to the edges, trim, pad, resize to 128."""
-    im = Image.open(io.BytesIO(png)).convert("RGB")
-    w, h = im.size
-    marker = (255, 0, 255)
-    filled = im.copy()
-    for x in range(0, w, 32):
-        for y in (0, h - 1):
-            if filled.getpixel((x, y)) != marker:
-                ImageDraw.floodfill(filled, (x, y), marker, thresh=40)
-    for y in range(0, h, 32):
-        for x in (0, w - 1):
-            if filled.getpixel((x, y)) != marker:
-                ImageDraw.floodfill(filled, (x, y), marker, thresh=40)
-    rgba = im.convert("RGBA")
-    px, fp = rgba.load(), filled.load()
-    for y in range(h):
-        for x in range(w):
-            if fp[x, y] == marker:
-                px[x, y] = (255, 255, 255, 0)
-            else:  # soften the light anti-aliased fringe next to the background
-                r, g, b, _ = px[x, y]
-                light = min(r, g, b)
-                if light > 235:
-                    px[x, y] = (r, g, b, max(0, int((255 - light) * 12)))
-    bbox = rgba.getbbox()
+    """Turn the purple-on-white drawing into one flat colour with an alpha mask; trim, pad, resize to 128."""
+    im = Image.open(io.BytesIO(png)).convert("L")  # luminance
+    ink = 0.299 * COLOUR[0] + 0.587 * COLOUR[1] + 0.114 * COLOUR[2]
+    alpha = im.point(lambda v: max(0, min(255, int((255 - v) * 255 / (255 - ink)))))
+    alpha = alpha.point(lambda a: 0 if a < 18 else a)  # drop faint paper noise
+    bbox = alpha.getbbox()
     if bbox:
-        rgba = rgba.crop(bbox)
-    side = int(max(rgba.size) * 1.08)
-    canvas = Image.new("RGBA", (side, side), (255, 255, 255, 0))
-    canvas.paste(rgba, ((side - rgba.width) // 2, (side - rgba.height) // 2))
-    return canvas.resize((128, 128), Image.LANCZOS)
+        alpha = alpha.crop(bbox)
+    side = int(max(alpha.size) * 1.08)
+    mask = Image.new("L", (side, side), 0)
+    mask.paste(alpha, ((side - alpha.width) // 2, (side - alpha.height) // 2))
+    out = Image.new("RGBA", (side, side), COLOUR + (0,))
+    out.putalpha(mask)
+    return out.resize((128, 128), Image.LANCZOS)
 
 
 def make(name: str) -> str:
