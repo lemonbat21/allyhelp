@@ -6,6 +6,7 @@
 Inlines the CSS, the SVG artwork and every JS module (no network requests except
 Google Fonts). The normal multi-file app (index.html) is unchanged.
 """
+import base64
 import json
 import re
 from pathlib import Path
@@ -42,6 +43,9 @@ def main():
 
     svgs = {n: (ROOT / "assets" / f"{n}.svg").read_text() for n in ASSETS}
     svg_json = json.dumps(svgs).replace("</", "<\\/")
+    icons = {p.stem: "data:image/png;base64," + base64.b64encode(p.read_bytes()).decode()
+             for p in sorted((ROOT / "assets" / "icons").glob("*.png"))}
+    icon_json = json.dumps(icons)
     bundle = "".join(wrap_module(m) for m in MODULES)
     if "</script" in bundle.lower():
         raise SystemExit("bundle contains </script")
@@ -56,7 +60,7 @@ def main():
 {css}
 </style>
 {body}
-<script>window.__ARTIFACT = true; window.__INLINE_SVG = {svg_json};</script>
+<script>window.__ARTIFACT = true; window.__INLINE_SVG = {svg_json}; window.__INLINE_ICONS = {icon_json};</script>
 <script type="module">
 {bundle}
 </script>

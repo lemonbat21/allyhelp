@@ -47,6 +47,7 @@
     <main id="view" tabindex="-1"></main>
 
     <nav class="tabbar" aria-label="Main">
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
       <button data-tab="today" class="on"><span>🏠</span>Today</button>
       <button data-tab="finished"><span>⭐</span>Finished</button>
       <button data-tab="wallet"><span>🎫</span>Wallet</button>
@@ -55,7 +56,6 @@
   </div>
 
   <div id="overlay" class="overlay" hidden></div>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script type="module" src="js/app.js"></script>
 </body>

@@ -1,10 +1,11 @@
 // Offline support: the whole app is cached on first visit.
-const VERSION = 'cloudcat-v2';
+const VERSION = 'cloudcat-v3';
 const SHELL = [
   './', 'index.html', 'styles.css', 'manifest.webmanifest',
   'js/app.js', 'js/data.js', 'js/persona.js', 'js/storage.js', 'js/audio.js', 'js/ai.js',
   'assets/cloud-cat.svg', 'assets/running-cat.svg', 'assets/star.svg', 'assets/icon.svg',
   'assets/scene-suitcase.svg', 'assets/scene-train.svg', 'assets/scene-airport.svg',
+  'assets/icons/alarm.png', 'assets/icons/backpack.png', 'assets/icons/bath.png', 'assets/icons/bed.png', 'assets/icons/broom.png', 'assets/icons/calendar.png', 'assets/icons/camera.png', 'assets/icons/car.png', 'assets/icons/chair.png', 'assets/icons/gear.png', 'assets/icons/house.png', 'assets/icons/landing.png', 'assets/icons/lift.png', 'assets/icons/magnifier.png', 'assets/icons/passport.png', 'assets/icons/paw.png', 'assets/icons/phone.png', 'assets/icons/plane.png', 'assets/icons/return.png', 'assets/icons/seat.png', 'assets/icons/security.png', 'assets/icons/star.png', 'assets/icons/ticket.png', 'assets/icons/train.png',
   'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png',
 ];
 

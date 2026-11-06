@@ -31,6 +31,20 @@ let tab = 'today';
 const ui = { showDone: false, ifOpen: false, timesOpen: false, shown: new Set(), tickCount: 0, nextBubbleAt: 3, finOpen: {} };
 const save = () => store.save(state);
 
+// Pastel icons (assets/icons/*.png). Emoji in the data map to these names.
+const ICON_FOR = {
+  '✈️': 'plane', '🚆': 'train', '📱': 'phone', '📸': 'camera', '🛂': 'passport', '🎒': 'backpack', '🛁': 'bath',
+  '🐾': 'paw', '🛏️': 'bed', '🧹': 'broom', '🚗': 'car', '🛗': 'lift', '🛃': 'security', '🔎': 'magnifier',
+  '🪑': 'chair', '💺': 'seat', '🇬🇧': 'landing', '🇩🇰': 'landing', '⏰': 'alarm', '🏡': 'house',
+};
+const SECTION_ICON = { prep: 'calendar', flight: 'plane', home: 'return' };
+const TAB_ICON = { today: 'house', finished: 'star', wallet: 'ticket', settings: 'gear' };
+function icon(name, cls = '') {
+  if (!name) return null;
+  return h('img', { class: `ic ${cls}`.trim(), src: window.__INLINE_ICONS?.[name] ?? `assets/icons/${name}.png`, alt: '', 'aria-hidden': 'true', draggable: 'false' });
+}
+const gi = (g, cls) => (ICON_FOR[g.icon] ? icon(ICON_FOR[g.icon], cls) : g.icon);
+
 const SVG = {};
 async function loadAssets() {
   const names = ['cloud-cat', 'running-cat', 'scene-suitcase', 'scene-train', 'scene-airport', 'star'];
@@ -120,7 +134,7 @@ function renderHeader() {
   pills.replaceChildren(...SECTIONS.map((x) => h('button', {
     class: x.id === s.id ? 'on' : '', 'aria-pressed': String(x.id === s.id),
     onclick: () => { if (state.section === x.id) return; sfx.softTap(); state.section = x.id; ui.shown.clear(); save(); renderAll(); },
-  }, `${x.emoji} ${x.short}`)));
+  }, icon(SECTION_ICON[x.id]), ` ${x.short}`)));
   renderStars();
   updateProgress(false);
 }
@@ -138,17 +152,15 @@ function addStar(id, color, big, animate) {
   const el = h('span', { class: `star${big ? ' big' : ''}`, 'data-id': id, style: { left: `${x}%`, top: `${y}px`, animationDelay: `${(hash(id) % 3000) / 1000}s` } });
   el.append(starSvg(color));
   layer.append(el);
-  if (!animate || document.body.classList.contains('reduce-motion')) { el.classList.add('settled'); return; }
+  if (!animate || document.body.classList.contains('reduce-motion')) return;
   const sky = $('#sky').getBoundingClientRect();
   const cat = $('#cloudcat').getBoundingClientRect();
   const sx = cat.left + cat.width * 0.47 - sky.left; const sy = cat.top + cat.height * 0.5 - sky.top;
-  const tx = (x / 100) * sky.width; const ty = y;
-  const dx = sx - tx; const dy = sy - ty;
-  el.animate([
-    { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(.2)`, opacity: 0 },
-    { transform: `translate(calc(-50% + ${dx * 0.5}px), calc(-50% + ${dy * 0.5 - 40}px)) scale(${big ? 1.8 : 1.4})`, opacity: 1, offset: 0.55 },
-    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
-  ], { duration: big ? 1300 : 900, easing: 'cubic-bezier(.3,.9,.4,1)' }).onfinish = () => el.classList.add('settled');
+  const tx = (x / 100) * sky.width;
+  const size = big ? 36 : 16; const peak = big ? 64 : 26;
+  const at = (px, py, sz) => ({ left: `${px}px`, top: `${py}px`, width: `${sz}px`, height: `${sz}px`, marginLeft: `${-sz / 2}px`, marginTop: `${-sz / 2}px` });
+  el.animate([at(sx, sy, 4), { ...at((sx + tx) / 2, (sy + y) / 2 - 40, peak), offset: 0.55 }, at(tx, y, size)],
+    { duration: big ? 1300 : 900, easing: 'cubic-bezier(.3,.9,.4,1)' });
 }
 function renderStars() {
   const layer = $('#stars'); layer.replaceChildren();
@@ -316,7 +328,7 @@ function groupCard(s, g, i) {
     'aria-label': `${g.name}, ${done ? 'finished' : `${d} of ${n} done`}`,
     onclick: () => { sfx.softTap(); delete state.skipped[g.id]; state.active[s.id] = g.id; ui.showDone = false; ui.ifOpen = false; ui.shown.clear(); save(); renderView(); window.scrollTo({ top: 0, behavior: 'smooth' }); },
   },
-  h('span', { class: 'gicon' }, g.icon),
+  h('span', { class: 'gicon' }, gi(g)),
   h('span', {},
     g.badge === 'first' && !done ? h('span', { class: 'badge' }, 'DO FIRST') : null,
     h('span', { class: 'gname', style: { display: 'block' } }, g.name),
@@ -359,9 +371,10 @@ function viewGroup(s, part, g, journey) {
       h('button', { class: 'link', onclick: () => openStages(s, part) }, 'All stages ▾')));
   }
   out.push(viewScene(g));
+  const panelStart = out.length;
   const stepNo = Math.min(doneN + 1, cs.length);
   out.push(h('div', { class: 'gtitle' },
-    h('h2', {}, `${g.icon} ${g.name}`),
+    h('h2', {}, gi(g), ' ', g.name),
     h('span', { class: 'of' }, done ? 'All done ✓' : `Step ${stepNo} of ${cs.length}`)));
   if (g.time) out.push(h('p', { class: 'gintro' }, `🕐 ${g.time}`));
   if (g.intro) out.push(h('p', { class: 'gintro' }, g.intro));
@@ -396,7 +409,7 @@ function viewGroup(s, part, g, journey) {
       const alt = nextLogical(s, part, g.id);
       out.push(h('div', { class: 'card', style: { textAlign: 'center' } },
         h('p', { style: { fontWeight: 800, margin: '2px 0 12px' } }, `🕐 This one ${nx.opensLabel}.`),
-        alt ? h('button', { class: 'btn primary', onclick: () => { sfx.softTap(); startGroup(s, alt); renderView(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }, `Do ${alt.icon} ${alt.name} until then`) : null));
+        alt ? h('button', { class: 'btn primary', onclick: () => { sfx.softTap(); startGroup(s, alt); renderView(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }, 'Do ', gi(alt), ` ${alt.name} until then`) : null));
     }
   }
   if (!unticked.length && !journey) {
@@ -412,9 +425,10 @@ function viewGroup(s, part, g, journey) {
         h('span', {}, 'If something goes differently'), h('span', {}, ui.ifOpen ? '▴' : '▾')),
       ui.ifOpen ? h('div', { class: 'ifs' }, ifs.map((x) => h('div', { class: 'ifitem' }, h('b', {}, x.q), x.a, x.say ? sayCard(x.say) : null))) : null));
   }
+  out.splice(panelStart, out.length - panelStart, h('section', { class: 'panel' }, out.slice(panelStart)));
   if (journey) {
     const gs = groupsOf(s, part.id); const nxt = gs.slice(gs.indexOf(g) + 1).find((x) => !groupDone(x));
-    out.push(h('p', { class: 'after' }, nxt ? `After this: ${nxt.icon} ${nxt.name}` : 'This is the last stage 💜'));
+    out.push(h('p', { class: 'after' }, nxt ? ['After this: ', gi(nxt), ` ${nxt.name}`] : 'This is the last stage 💜'));
   }
   return out;
 }
@@ -484,7 +498,7 @@ function openStages(s, part) {
   const list = h('div', { class: 'helplist' }, gs.map((g, i) => h('button', {
     class: `helpbtn${g === cur ? ' calm' : ''}`,
     onclick: () => { state.stage[part.id] = g.id; ui.ifOpen = false; ui.shown.clear(); save(); closeOverlay(); renderView(); window.scrollTo({ top: 0 }); },
-  }, `${groupDone(g) ? '⭐' : g === cur ? '👉' : '○'}  ${i + 1}. ${g.icon} ${g.name}${g.time ? ` · ${g.time}` : ''}`)));
+  }, `${groupDone(g) ? '⭐' : g === cur ? '👉' : '○'}  ${i + 1}. `, gi(g), ` ${g.name}${g.time ? ` · ${g.time}` : ''}`)));
   openSheet('All stages', list);
 }
 
@@ -499,14 +513,14 @@ function viewFinished() {
   for (const s of SECTIONS) {
     const done = s.groups.filter((g) => state.groupDone[g.id] && groupDone(g));
     const partial = s.groups.filter((g) => !groupDone(g) && checks(g).some(isTicked));
-    const box = h('div', { class: 'fin-section' }, h('div', { class: 'h3' }, `${s.emoji} ${s.title} · ${sectionProgress(s).pct}%`));
+    const box = h('div', { class: 'fin-section' }, h('div', { class: 'h3' }, icon(SECTION_ICON[s.id]), ` ${s.title} · ${sectionProgress(s).pct}%`));
     if (!done.length && !partial.length) { box.append(h('p', { class: 'muted', style: { margin: '4px' } }, 'Nothing here yet, and that’s okay.')); out.push(box); continue; }
     if (done.length) box.append(h('div', { class: 'constellation', style: { justifyContent: 'flex-start' } }, done.map((g) => { const sp = h('span'); sp.append(starSvg(g.color)); return sp; })));
     for (const g of [...done, ...partial]) {
       const st = h('span', { class: 's' }); st.append(starSvg(groupDone(g) ? g.color : '#E3D9FA'));
       const open = ui.finOpen[g.id];
       box.append(h('button', { class: 'fin-group', 'aria-expanded': String(!!open), onclick: () => { ui.finOpen[g.id] = !open; renderView(); } },
-        st, h('span', { style: { flex: 1 } }, h('b', {}, `${g.icon} ${g.name}`), h('br'), h('small', { class: 'muted' }, groupDone(g) ? `Finished ${fmtWhen(state.groupDone[g.id])}` : `${checks(g).filter(isTicked).length} of ${checks(g).length} done`)), open ? '▴' : '▾'));
+        st, h('span', { style: { flex: 1 } }, h('b', {}, gi(g), ' ', g.name), h('br'), h('small', { class: 'muted' }, groupDone(g) ? `Finished ${fmtWhen(state.groupDone[g.id])}` : `${checks(g).filter(isTicked).length} of ${checks(g).length} done`)), open ? '▴' : '▾'));
       if (open) {
         box.append(h('ul', { class: 'fin-steps' }, checks(g).map((x) => h('li', {},
           h('button', { class: 'chip', onclick: () => { if (isTicked(x)) { delete state.ticks[x.id]; delete state.groupDone[g.id]; } else state.ticks[x.id] = Date.now(); save(); renderStars(); updateProgress(); renderView(); } }, isTicked(x) ? '✓' : '○'),
@@ -714,14 +728,16 @@ function openCatMenu() {
   const cat = svgEl('cloud-cat');
   const petcat = h('div', { class: 'petcat', 'aria-label': 'Stroke the cat' }, cat);
   const hint = h('div', { class: 'pethint' }, 'Hi 💜');
-  let idle; let lastHeart = 0; let lastLine = 0;
+  let idle; let lastHeart = 0; let lastLine = 0; let node;
   const pet = (x, y) => {
     sfx.purrStart(); petcat.classList.add('petting'); cat.classList.remove('meow');
     const now = Date.now();
     if (now - lastHeart > 140 && x != null) {
       lastHeart = now;
-      document.body.append(Object.assign(h('span', { class: 'heart', style: { left: `${x}px`, top: `${y - 20}px`, '--dx': `${(Math.random() - 0.5) * 60}px` } }, pick(['💜', '🤍', '🩷'])), {}));
-      setTimeout(() => document.querySelectorAll('.heart').forEach((el) => { if (Date.now() - lastHeart > 1300) el.remove(); }), 1500);
+      const box = node.getBoundingClientRect();
+      const ht = h('span', { class: 'heart', style: { left: `${x - box.left}px`, top: `${y - box.top - 20}px` } }, pick(['💜', '🤍', '🩷']));
+      ht.style.setProperty('--dx', `${(Math.random() - 0.5) * 60}px`);
+      node.append(ht); setTimeout(() => ht.remove(), 1400);
     }
     if (now - lastLine > 2600) { lastLine = now; hint.textContent = pick(PET_LINES); }
     clearTimeout(idle); idle = setTimeout(() => { sfx.purrStop(); petcat.classList.remove('petting'); }, 650);
@@ -730,7 +746,7 @@ function openCatMenu() {
   petcat.addEventListener('pointerdown', (e) => { down = true; petcat.setPointerCapture(e.pointerId); pet(e.clientX, e.clientY); });
   petcat.addEventListener('pointermove', (e) => { if (down || e.pointerType === 'mouse') pet(e.clientX, e.clientY); });
   petcat.addEventListener('pointerup', () => { down = false; });
-  const node = h('div', { class: 'petstage' }, petcat, hint,
+  node = h('div', { class: 'petstage' }, petcat, hint,
     h('div', { class: 'petbtns' },
       h('button', { class: 'btn', onclick: () => {
         hint.textContent = 'Stroke him gently with your finger 🤍';
@@ -750,7 +766,7 @@ function openHelp() {
   s.help.forEach((x) => items.push({ ...x, cls: s.id === 'prep' ? '' : 'if' }));
   items.push({ ...OVERWHELM, cls: 'calm', overwhelm: true });
   const body = h('div', {},
-    g ? h('p', { class: 'muted', style: { margin: '0 2px 10px' } }, `You’re on: ${g.icon} ${g.name}`) : null,
+    g ? h('p', { class: 'muted', style: { margin: '0 2px 10px' } }, 'You’re on: ', gi(g), ` ${g.name}`) : null,
     h('div', { class: 'helplist' },
       items.map((it) => h('button', { class: `helpbtn ${it.cls}`, onclick: () => (it.overwhelm ? openOverwhelm() : showAnswer(it)) }, it.q)),
       h('div', { class: 'h3' }, 'Or talk to me'),
@@ -767,7 +783,7 @@ function showAnswer(it) {
       || groupsOf(s, part.id).find((g) => !groupDone(g));
     if (cand) {
       const n = checks(cand).filter((x) => !isTicked(x)).length;
-      answer = `How about ${cand.icon} ${cand.name}? It’s only ${n} little step${n > 1 ? 's' : ''}.`;
+      answer = ['How about ', gi(cand), ` ${cand.name}? It’s only ${n} little step${n > 1 ? 's' : ''}.`];
       action = h('button', { class: 'btn primary', onclick: () => { state.active[s.id] = cand.id; save(); closeOverlay(); go('today'); } }, 'Start it');
     } else answer = 'Everything here is done already. You can rest 💜';
   }
@@ -782,7 +798,7 @@ function showAnswer(it) {
 function openOverwhelm() {
   sfx.unlock(); sfx.softTap();
   const node = h('div', { class: 'card', style: { width: 'min(440px, calc(100% - 32px))', textAlign: 'center' }, role: 'dialog', 'aria-label': 'Overwhelmed' },
-    h('div', { class: 'breathe', 'aria-hidden': 'true' }, 'breathe'),
+    h('div', { class: 'breathe', 'aria-hidden': 'true' }, h('span', {}, 'breathe')),
     h('p', { class: 'answer', style: { fontSize: '1.1rem' } }, OVERWHELM.a),
     sayCard(OVERWHELM.say),
     h('p', { class: 'muted', style: { marginTop: '14px' } }, nextStepText() ? `When you’re ready, the next step is: ${nextStepText()}` : ''),
@@ -886,7 +902,7 @@ async function boot() {
   catSvg = svgEl('cloud-cat');
   $('#cloudcat').append(catSvg);
   const runner = svgEl('running-cat');
-  $('#runner').append(runner, h('span', { class: 'dust' }));
+  $('#runner').append(runner);
   const trot = () => {
     const r = $('#runner');
     if (state.settings.reduceMotion || document.hidden) r.dataset.pose = '';
@@ -895,7 +911,10 @@ async function boot() {
   };
   trot();
   $('#cloudcat').addEventListener('click', openCatMenu);
-  document.querySelectorAll('.tabbar button').forEach((b) => b.addEventListener('click', () => { sfx.softTap(); go(b.dataset.tab); }));
+  document.querySelectorAll('.tabbar button').forEach((b) => {
+    b.querySelector('span')?.replaceChildren(icon(TAB_ICON[b.dataset.tab]));
+    b.addEventListener('click', () => { sfx.softTap(); go(b.dataset.tab); });
+  });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     const top = document.querySelector('.bigsay, .viewer'); if (top) top.remove(); else closeOverlay();
