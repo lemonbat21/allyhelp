@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+  <defs>
+    <clipPath id="airport-card-clip">
+      <rect width="400" height="220" rx="24"/>
+    </clipPath>
+    <clipPath id="airport-window-clip">
+      <rect x="20" y="68" width="360" height="130" rx="19"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#airport-card-clip)" stroke="#3D2B66" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="400" height="220" fill="#EDE6FF" stroke="none"/>
+    <path d="M0 183Q200 170 400 183V220H0Z" fill="#DED0F3" stroke="none"/>
+    <g clip-path="url(#airport-window-clip)">
+      <rect x="20" y="68" width="360" height="130" fill="#DCE9FF" stroke="none"/>
+      <path d="M20 110C25 100 33 100 39 103C40 86 61 83 70 96C82 87 99 97 96 108C111 105 122 114 116 121H20Z" fill="#FBE3EE" stroke="none"/>
+      <path d="M262 99C260 87 275 80 285 87C291 66 322 68 329 87C343 79 360 88 358 101C370 98 382 104 385 115H259C250 111 254 101 262 99Z" fill="#F7F3FF" stroke="none"/>
+      <path d="M147 125C148 115 159 112 166 118C173 103 195 105 200 121C213 115 226 122 225 131H140C136 128 140 124 147 125Z" fill="#FBE3EE" stroke="none"/>
+      <path d="M20 156H380V198H20Z" fill="#C9B8F5" stroke="none"/>
+      <path d="M80 68V198M160 68V198M240 68V198M320 68V198M20 113H380M20 157H380" fill="none" stroke="#FFFFFF" stroke-width="5"/>
+    </g>
+    <rect x="20" y="68" width="360" height="130" rx="19" fill="none" stroke="#F7F3FF" stroke-width="6"/>
+    <ellipse cx="57" cy="204" rx="29" ry="5" fill="#C9B8F5" stroke="none"/>
+    <ellipse cx="334" cy="205" rx="29" ry="5" fill="#C9B8F5" stroke="none"/>
+    <g>
+      <path d="M56 182Q56 154 49 135M56 172Q64 148 74 138" fill="none"/>
+      <path d="M53 155C35 152 28 137 30 126C44 127 55 139 53 155Z" fill="#BDEBD8"/>
+      <path d="M57 151C54 133 64 120 77 118C80 133 69 145 57 151Z" fill="#7CC79A"/>
+      <path d="M54 170C38 172 28 164 24 156C38 149 50 157 54 170Z" fill="#7CC79A"/>
+      <path d="M58 166C61 152 75 148 85 153C79 164 69 170 58 166Z" fill="#BDEBD8"/>
+      <path d="M39 181H74L71 202H43Z" fill="#C9B8F5"/>
+      <rect x="37" y="178" width="39" height="8" rx="4" fill="#E9E3F5"/>
+    </g>
+    <g>
+      <rect x="103" y="142" width="80" height="52" rx="5" fill="#C9B8F5"/>
+      <path d="M173 145V192" fill="none" stroke="#A98BE8"/>
+      <rect x="98" y="140" width="90" height="10" rx="4" fill="#E9E3F5"/>
+      <path d="M115 138L119 116Q119 113 123 113H149Q153 113 152 117L148 138Z" fill="#7B5CC4"/>
+      <path d="M123 118H146L143 131H121Z" fill="#EDE6FF" stroke="none"/>
+      <path d="M126 122H137" stroke="#FFFFFF" stroke-width="2"/>
+      <path d="M113 139H151" fill="none"/>
+      <rect x="206" y="142" width="80" height="52" rx="5" fill="#C9B8F5"/>
+      <path d="M276 145V192" fill="none" stroke="#A98BE8"/>
+      <rect x="201" y="140" width="90" height="10" rx="4" fill="#E9E3F5"/>
+      <path d="M218 138L222 116Q222 113 226 113H252Q256 113 255 117L251 138Z" fill="#7B5CC4"/>
+      <path d="M226 118H249L246 131H224Z" fill="#EDE6FF" stroke="none"/>
+      <path d="M229 122H240" stroke="#FFFFFF" stroke-width="2"/>
+      <path d="M216 139H254" fill="none"/>
+    </g>
+    <g>
+      <path d="M95 166Q135 179 191 166Q243 179 299 166" fill="none" stroke="#7B5CC4" stroke-width="6"/>
+      <path d="M95 164Q135 176 191 164Q243 176 299 164" fill="none" stroke="#C9B8F5" stroke-width="2"/>
+      <path d="M91 163Q91 159 95 159Q99 159 99 163V203H91Z" fill="#F7F3FF"/>
+      <rect x="85" y="202" width="20" height="6" rx="3" fill="#E9E3F5"/>
+      <path d="M187 163Q187 159 191 159Q195 159 195 163V203H187Z" fill="#F7F3FF"/>
+      <rect x="181" y="202" width="20" height="6" rx="3" fill="#E9E3F5"/>
+      <path d="M295 163Q295 159 299 159Q303 159 303 163V203H295Z" fill="#F7F3FF"/>
+      <rect x="289" y="202" width="20" height="6" rx="3" fill="#E9E3F5"/>
+    </g>
+    <g>
+      <path d="M327 150V130H342V150" fill="none"/>
+      <rect x="323" y="126" width="23" height="7" rx="3" fill="#F7F3FF"/>
+      <rect x="312" y="149" width="45" height="53" rx="8" fill="#C9B8F5"/>
+      <path d="M321 159V191M334 159V191M347 159V191" fill="none" stroke="#A98BE8"/>
+      <path d="M319 152H348" stroke="#EDE6FF" stroke-width="2"/>
+      <path d="M320 203V206M349 203V206" stroke-width="6"/>
+    </g>
+    <g fill="#A98BE8" stroke="none">
+      <path d="M102 76Q104 85 111 87Q104 89 102 97Q100 89 93 87Q100 85 102 76Z"/>
+      <path d="M365 131Q367 138 373 140Q367 142 365 149Q363 142 357 140Q363 138 365 131Z"/>
+      <path d="M275 79Q276 84 281 85Q276 86 275 91Q274 86 269 85Q274 84 275 79Z"/>
+    </g>
+    <path d="M123 0V14M277 0V14" fill="none"/>
+    <rect x="90" y="14" width="220" height="42" rx="12" fill="#F7F3FF" stroke="#3D2B66" stroke-width="3"/>
+    <path d="M101 32L110 34L120 24Q123 21 125 24Q126 25 124 28L117 37L120 44L117 47L112 41L107 45L104 44L107 38L100 35Z" fill="#3D2B66" stroke="none"/>
+    <text id="sign-text" x="214" y="42" text-anchor="middle" font-family="Nunito, Quicksand, sans-serif" font-weight="800" font-size="20" fill="#3D2B66" stroke="none">Check In</text>
+  </g>
+</svg>

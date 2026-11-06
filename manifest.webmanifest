@@ -1,0 +1,16 @@
+{
+  "name": "Cloud Cat · Travel steps",
+  "short_name": "Cloud Cat",
+  "description": "A gentle step-by-step travel checklist with a little cloud cat.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F3EEFF",
+  "theme_color": "#EDE6FF",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

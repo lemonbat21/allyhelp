@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="180" viewBox="0 0 240 180" fill="none" stroke="#3D2B66" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <clipPath id="cloudcat-cloud-clip">
+      <path d="M19 124C8 111 18 96 35 98C38 81 61 80 70 96C83 84 103 86 111 99C125 85 148 87 157 101C172 89 193 94 198 110C218 104 234 120 225 136C240 151 224 170 205 169C193 177 174 174 163 170C146 178 125 174 115 170C95 178 77 174 66 170C45 177 24 171 22 160C5 157 3 136 19 124Z"/>
+    </clipPath>
+  </defs>
+  <g id="cloud">
+    <path d="M19 124C8 111 18 96 35 98C38 81 61 80 70 96C83 84 103 86 111 99C125 85 148 87 157 101C172 89 193 94 198 110C218 104 234 120 225 136C240 151 224 170 205 169C193 177 174 174 163 170C146 178 125 174 115 170C95 178 77 174 66 170C45 177 24 171 22 160C5 157 3 136 19 124Z" fill="#FFFFFF"/>
+    <g clip-path="url(#cloudcat-cloud-clip)" stroke="none">
+      <path d="M3 142C23 154 39 146 49 139C58 157 82 161 98 148C114 162 140 162 154 148C170 161 196 155 201 142C215 150 230 140 240 135V180H0Z" fill="#FBE3EE"/>
+    </g>
+    <path d="M19 124C8 111 18 96 35 98C38 81 61 80 70 96C83 84 103 86 111 99C125 85 148 87 157 101C172 89 193 94 198 110C218 104 234 120 225 136C240 151 224 170 205 169C193 177 174 174 163 170C146 178 125 174 115 170C95 178 77 174 66 170C45 177 24 171 22 160C5 157 3 136 19 124Z"/>
+    <path d="M29 127C34 119 44 118 51 122M182 131C189 124 199 125 204 130" stroke="#FBE3EE" stroke-width="4"/>
+  </g>
+  <g id="cat">
+    <g id="tail">
+      <path d="M165 109C178 119 199 117 204 104C209 91 200 81 190 85C182 88 184 99 192 98C187 105 178 101 172 98Z" fill="#E9E3F5"/>
+      <path d="M193 85C198 87 200 91 200 95M182 105L179 113" stroke="#9C88C9" stroke-width="6"/>
+    </g>
+    <path d="M124 85C135 65 158 66 175 77C188 85 192 101 182 110C171 120 145 117 128 112Z" fill="#E9E3F5"/>
+    <path d="M154 73L153 83M168 78L165 88M179 87L174 95" stroke="#9C88C9" stroke-width="6"/>
+    <path d="M80 80C79 67 81 50 85 42C92 44 101 53 106 61C117 58 130 58 140 62C145 53 152 46 159 43C163 52 164 68 162 80C172 97 161 115 143 117H100C80 116 69 98 80 80Z" fill="#E9E3F5"/>
+    <path d="M86 53L98 66L85 70Z" fill="#F9B9CF" stroke="none"/>
+    <path d="M155 54L145 67L157 71Z" fill="#F9B9CF" stroke="none"/>
+    <path d="M108 62L113 74C114 77 117 77 118 73L120 60M126 60L129 72C130 76 133 76 134 72L137 62" fill="#9C88C9" stroke="none"/>
+    <path d="M88 81L96 85M83 91L92 93M156 82L149 86M160 92L152 94" stroke="#9C88C9" stroke-width="4"/>
+    <ellipse cx="121" cy="103" rx="21" ry="12" fill="#FFFFFF" stroke="none"/>
+    <ellipse cx="93" cy="99" rx="8" ry="5" fill="#F9B9CF" stroke="none"/>
+    <ellipse cx="149" cy="99" rx="8" ry="5" fill="#F9B9CF" stroke="none"/>
+    <path d="M82 99L72 97M83 105L74 108M159 99L169 97M159 105L167 108" stroke-width="2"/>
+    <g id="eyes-closed">
+      <path d="M97 87Q103 93 109 87M133 87Q139 93 145 87"/>
+    </g>
+    <g id="eyes-open" display="none">
+      <ellipse cx="103" cy="88" rx="6" ry="7.5" fill="#3D2B66" stroke-width="2"/>
+      <ellipse cx="139" cy="88" rx="6" ry="7.5" fill="#3D2B66" stroke-width="2"/>
+      <circle cx="101" cy="85.5" r="2.2" fill="#FFFFFF" stroke="none"/>
+      <circle cx="137" cy="85.5" r="2.2" fill="#FFFFFF" stroke="none"/>
+    </g>
+    <path d="M118 96Q121 94 124 96L121 99Z" fill="#3D2B66" stroke="none"/>
+    <g id="mouth-smile">
+      <path d="M115 101Q116 106 121 102Q126 106 127 101" stroke-width="2.5"/>
+    </g>
+    <g id="mouth-meow" display="none">
+      <ellipse cx="121" cy="104" rx="4.5" ry="5" fill="#F9B9CF" stroke-width="2.5"/>
+    </g>
+    <path d="M98 108C89 106 82 110 84 117C86 124 102 125 106 118C109 113 104 109 98 108Z" fill="#E9E3F5"/>
+    <path d="M143 108C151 106 160 110 158 117C156 124 140 125 136 118C133 113 137 109 143 108Z" fill="#E9E3F5"/>
+    <path d="M91 117L91 120M97 118L97 121M145 118L145 121M151 117L151 120" stroke="#9C88C9" stroke-width="2"/>
+  </g>
+  <path d="M47 51Q49 60 56 62Q49 64 47 73Q45 64 38 62Q45 60 47 51ZM195 42Q197 49 203 51Q197 53 195 60Q193 53 187 51Q193 49 195 42Z" fill="#EDE6FF" stroke="#A98BE8" stroke-width="2"/>
+</svg>

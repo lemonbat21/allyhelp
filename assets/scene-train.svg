@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+  <defs>
+    <linearGradient id="lund-platform-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#DCE9FF"/>
+      <stop offset="1" stop-color="#EDE6FF"/>
+    </linearGradient>
+    <clipPath id="lund-platform-card">
+      <rect x="0" y="0" width="400" height="220" rx="24"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#lund-platform-card)">
+    <rect width="400" height="220" fill="url(#lund-platform-sky)"/>
+    <g stroke="#3D2B66" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 91C9 84 16 78 24 80C26 67 44 65 51 77C60 72 72 79 70 88C82 87 86 96 78 100H18C11 100 8 96 12 91Z" fill="#F7F3FF" stroke="none"/>
+      <path d="M320 84C319 76 329 72 337 76C341 63 359 63 365 76C376 70 390 77 387 87C399 88 402 98 391 101H328C315 101 312 89 320 84Z" fill="#FBE3EE" stroke="none"/>
+      <path d="M0 143H400V180H0Z" fill="#C9B8F5" stroke="none"/>
+      <path d="M0 168H400" stroke="#9C88C9"/>
+      <path d="M23 88V178M148 87V177" stroke="#9C88C9" stroke-width="6"/>
+      <path d="M10 71H229L250 91H0Z" fill="#BDEBD8" fill-opacity=".55"/>
+      <path d="M10 71H229L250 91H0M83 72L76 90M155 72L166 90M222 73L241 90" fill="none" stroke="#9C88C9"/>
+      <path d="M0 92H251" stroke="#3D2B66"/>
+      <path d="M0 177L400 173V220H0Z" fill="#EDE6FF" stroke="none"/>
+      <path d="M0 188L400 183" stroke="#FFE6A3" stroke-width="7"/>
+      <path d="M0 196L400 191" stroke="#C9B8F5" stroke-width="2"/>
+      <path d="M168 169H373" stroke="#7B5CC4" stroke-width="5"/>
+      <ellipse cx="272" cy="178" rx="112" ry="5" fill="#9C88C9" opacity=".3" stroke="none"/>
+      <circle cx="194" cy="170" r="9" fill="#7B5CC4"/>
+      <circle cx="267" cy="171" r="9" fill="#7B5CC4"/>
+      <circle cx="344" cy="171" r="9" fill="#7B5CC4"/>
+      <path d="M159 122Q159 108 174 106L292 96Q318 94 334 106L356 125L286 174H172Q159 174 159 161Z" fill="#C9B8F5"/>
+      <path d="M160 147L285 142V172H172Q160 172 160 160Z" fill="#F7F3FF" stroke="none"/>
+      <path d="M160 149L282 145" stroke="#7B5CC4" stroke-width="7"/>
+      <path d="M275 114Q282 99 302 99H330Q348 99 357 115L372 144V162Q372 176 358 176H291Q278 176 277 164Z" fill="#F7F3FF"/>
+      <path d="M277 137V116Q281 100 301 99H330Q347 99 357 115L367 136Z" fill="#C9B8F5" stroke="none"/>
+      <path d="M279 145H371" stroke="#7B5CC4" stroke-width="7"/>
+      <path d="M293 114Q295 109 302 109H329Q338 109 343 119L348 130Q349 134 344 134H294Q289 134 290 129Z" fill="#DCE9FF"/>
+      <path d="M300 112L295 130M308 112L302 130" stroke="#FFFFFF" stroke-width="3"/>
+      <path d="M316 110V133" stroke="#9C88C9" stroke-width="2"/>
+      <path d="M169 121Q169 117 174 117L191 115V136L169 138Z" fill="#DCE9FF"/>
+      <path d="M202 114L224 112V133L202 135Z" fill="#DCE9FF"/>
+      <path d="M235 111L255 109Q260 109 260 114V157Q260 162 255 163H235Z" fill="#EDE6FF"/>
+      <path d="M241 118L254 117V134L241 135Z" fill="#DCE9FF" stroke-width="2"/>
+      <path d="M251 143V148" stroke-width="2"/>
+      <circle cx="292" cy="157" r="6" fill="#FFE6A3"/>
+      <circle cx="355" cy="157" r="6" fill="#FFE6A3"/>
+      <path d="M310 161H337" stroke="#C9B8F5" stroke-width="4"/>
+      <path d="M306 174H343" stroke="#7B5CC4" stroke-width="4"/>
+      <path d="M80 114V176" stroke="#7B5CC4" stroke-width="5"/>
+      <path d="M70 177H90" stroke="#7B5CC4" stroke-width="5"/>
+      <circle cx="80" cy="105" r="18" fill="#F7F3FF"/>
+      <path d="M80 92V95M93 105H90M80 118V115M67 105H70" stroke="#9C88C9" stroke-width="2"/>
+      <path d="M80 98V105L87 109" fill="none"/>
+      <path d="M29 172V191M91 172V191" stroke="#7B5CC4" stroke-width="5"/>
+      <rect x="22" y="148" width="76" height="19" rx="6" fill="#C9B8F5"/>
+      <path d="M29 157H91" stroke="#9C88C9" stroke-width="2"/>
+      <rect x="19" y="167" width="82" height="9" rx="4" fill="#F7F3FF"/>
+      <path d="M24 163V175M96 163V175" fill="none"/>
+      <path d="M124 181V155" fill="none" stroke="#7CC79A"/>
+      <path d="M123 170Q107 169 107 154Q122 153 123 170Z" fill="#BDEBD8"/>
+      <path d="M125 163Q125 148 139 146Q141 159 125 163Z" fill="#7CC79A"/>
+      <path d="M124 155Q112 150 116 138Q129 142 124 155Z" fill="#BDEBD8"/>
+      <path d="M112 178H137L134 195Q133 199 129 199H120Q116 199 115 195Z" fill="#F9B9CF"/>
+    </g>
+    <g fill="#A98BE8">
+      <path d="M37 112Q39 121 46 123Q39 125 37 133Q35 125 28 123Q35 121 37 112Z"/>
+      <path d="M379 108Q381 115 387 117Q381 119 379 126Q377 119 371 117Q377 115 379 108Z"/>
+      <path d="M151 193Q153 198 158 200Q153 202 151 207Q149 202 144 200Q149 198 151 193Z"/>
+    </g>
+    <g stroke="#3D2B66" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M128 0V14M272 0V14" fill="none"/>
+      <rect x="100" y="14" width="200" height="42" rx="12" fill="#F7F3FF"/>
+    </g>
+    <text id="sign-text" x="200" y="42" text-anchor="middle" font-family="Nunito, Quicksand, sans-serif" font-weight="800" font-size="20" fill="#3D2B66">Lund C</text>
+  </g>
+</svg>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Cloud Cat</title>
+  <meta name="description" content="A gentle step-by-step travel checklist with a little cloud cat." />
+  <meta name="theme-color" content="#EDE6FF" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Cloud Cat" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="sprite" hidden></div>
+
+  <div id="app">
+    <header class="sky" id="sky">
+      <div class="sky-clouds" aria-hidden="true">
+        <span class="puff p1"></span><span class="puff p2"></span><span class="puff p3"></span>
+      </div>
+      <div class="stars-layer" id="stars" aria-hidden="true"></div>
+      <nav class="section-pills" id="sectionPills" aria-label="Choose a day"></nav>
+      <button class="cloudcat" id="cloudcat" aria-label="Tap the cat to pet him or get help"></button>
+      <div class="bubble" id="bubble" role="status" aria-live="polite"></div>
+      <div class="titles">
+        <h1 id="title">Cloud Cat</h1>
+        <p id="subtitle"></p>
+      </div>
+    </header>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progress">
+        <div class="fill" id="fill"></div>
+      </div>
+      <div class="runner" id="runner" aria-hidden="true"></div>
+      <span class="pct" id="pct">0%</span>
+    </div>
+
+    <main id="view" tabindex="-1"></main>
+
+    <nav class="tabbar" aria-label="Main">
+      <button data-tab="today" class="on"><span>🏠</span>Today</button>
+      <button data-tab="finished"><span>⭐</span>Finished</button>
+      <button data-tab="wallet"><span>🎫</span>Wallet</button>
+      <button data-tab="settings"><span>⚙️</span>Settings</button>
+    </nav>
+  </div>
+
+  <div id="overlay" class="overlay" hidden></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
