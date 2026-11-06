@@ -25,6 +25,13 @@ Open http://localhost:8787. (No install step needed; it just uses Node 18+.)
 
 ## Put it on your phone
 
+### Easiest: one HTML file
+
+[`cloud-cat.html`](cloud-cat.html) is the whole app in a single file. Open it in a browser (Chrome or Safari),
+then go to **Settings → AI helper**, paste your OpenAI API key and tap **Test connection**.
+The key is saved only in that browser on that phone; it is never written into the file, so the file is safe to share.
+Progress also saves in that browser. Rebuild it after any change with `python3 tools/build_artifact.py`.
+
 There are two ways. Both keep your progress in the phone's browser.
 
 ### A. The claude.ai page (easiest)

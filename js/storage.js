@@ -14,6 +14,8 @@ export const DEFAULT_SETTINGS = {
   theme: 'day',             // day | night
   aiUrl: '/api/chat',
   aiPass: '',
+  openaiKey: '',            // stored only in this browser, never in the file
+  openaiModel: 'gpt-5.5',
 };
 
 export function defaultState() {

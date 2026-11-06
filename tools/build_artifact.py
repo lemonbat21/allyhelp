@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Pack the app into ONE self-contained HTML file for publishing on claude.ai.
+"""Pack the app into ONE self-contained HTML file.
 
-    python3 tools/build_artifact.py        # writes dist/cloud-cat.html
+    python3 tools/build_artifact.py
+      → dist/cloud-cat.html   for publishing on claude.ai (the cat chats with the viewer's Claude)
+      → cloud-cat.html        a standalone file you can open in any browser (paste an OpenAI key in Settings)
 
 Inlines the CSS, the SVG artwork and every JS module (no network requests except
 Google Fonts). The normal multi-file app (index.html) is unchanged.
@@ -33,9 +35,9 @@ def wrap_module(name: str) -> str:
 
 
 def main():
-    css = (ROOT / "styles.css").read_text()
+    base_css = (ROOT / "styles.css").read_text()
     # claude.ai already pads the page for the phone's top inset.
-    css += "\n/* claude.ai page */\n.sky { padding-top: 0; }\n.cloudcat { top: 36px; animation-name: float-artifact; }\n@keyframes float-artifact { 0%, 100% { top: 36px; } 50% { top: 29px; } }\n.bubble { top: 46px; }\n"
+    css = base_css + "\n/* claude.ai page */\n.sky { padding-top: 0; }\n.cloudcat { top: 36px; animation-name: float-artifact; }\n@keyframes float-artifact { 0%, 100% { top: 36px; } 50% { top: 29px; } }\n.bubble { top: 46px; }\n"
 
     html = (ROOT / "index.html").read_text()
     body = html[html.index("<body>") + len("<body>"): html.index("</body>")]
@@ -69,6 +71,39 @@ def main():
     out.parent.mkdir(exist_ok=True)
     out.write_text(page)
     print(f"wrote {out.relative_to(ROOT)} ({len(page) // 1024} KB)")
+
+    # Standalone file: a complete page that runs from anywhere (file, Drive, any host).
+    icon_svg = base64.b64encode((ROOT / "assets" / "icon.svg").read_bytes()).decode()
+    standalone = f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cloud Cat</title>
+<meta name="theme-color" content="#EDE6FF">
+<meta name="color-scheme" content="light only">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cloud Cat">
+<link rel="icon" href="data:image/svg+xml;base64,{icon_svg}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+{base_css}
+</style>
+</head>
+<body>
+{body}
+<script>window.__STANDALONE = true; window.__INLINE_SVG = {svg_json}; window.__INLINE_ICONS = {icon_json};</script>
+<script type="module">
+{bundle}
+</script>
+</body>
+</html>
+"""
+    out2 = ROOT / "cloud-cat.html"
+    out2.write_text(standalone)
+    print(f"wrote {out2.relative_to(ROOT)} ({len(standalone) // 1024} KB)")
 
 
 if __name__ == "__main__":

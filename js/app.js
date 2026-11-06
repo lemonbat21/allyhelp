@@ -673,15 +673,26 @@ function viewSettings() {
       h('label', { class: 'field' }, h('span', {}, 'Text size')), seg('textSize', [[0.9, 'A−'], [1, 'A'], [1.15, 'A+'], [1.3, 'A++']])),
     h('div', { class: 'card' },
       h('b', {}, '💜 AI helper'),
-      h('p', { class: 'muted', style: { fontSize: '.9rem' } }, window.__ARTIFACT ? 'The cat talks using your own Claude (medium thinking). The first time, Claude asks you to allow it.' : 'Where the app reaches your GPT helper. Leave as /api/chat if you use the included server.'),
-      window.__ARTIFACT ? null : h('label', { class: 'field' }, h('span', {}, 'Helper address'), h('input', { type: 'url', value: st.aiUrl, oninput: (e) => { st.aiUrl = e.target.value.trim(); save(); } })),
-      window.__ARTIFACT ? null : h('label', { class: 'field' }, h('span', {}, 'Passcode'), h('input', { type: 'password', value: st.aiPass, oninput: (e) => { st.aiPass = e.target.value; save(); } })),
+      window.__ARTIFACT
+        ? h('p', { class: 'muted', style: { fontSize: '.9rem' } }, 'The cat talks using your own Claude (medium thinking). The first time, Claude asks you to allow it.')
+        : [
+          h('p', { class: 'muted', style: { fontSize: '.9rem' } }, 'Paste your OpenAI API key and the cat talks using ChatGPT. The key is saved only in this browser on this phone. It is never put in the file.'),
+          h('label', { class: 'field' }, h('span', {}, 'OpenAI API key'),
+            h('input', { id: 'openai-key', type: 'password', autocomplete: 'off', spellcheck: 'false', placeholder: 'sk-…', value: st.openaiKey, oninput: (e) => { st.openaiKey = e.target.value.trim(); save(); } })),
+          h('label', { class: 'field' }, h('span', {}, 'Model'),
+            h('input', { id: 'openai-model', type: 'text', autocomplete: 'off', spellcheck: 'false', value: st.openaiModel, oninput: (e) => { st.openaiModel = e.target.value.trim() || 'gpt-5.5'; save(); } })),
+          st.openaiKey ? h('button', { class: 'link', onclick: () => { st.openaiKey = ''; save(); renderView(); toast('Key removed from this phone'); } }, 'Remove key from this phone') : null,
+          window.__STANDALONE ? null : h('details', { class: 'muted', style: { fontSize: '.9rem', margin: '6px 0' } },
+            h('summary', {}, 'Or use your own helper server'),
+            h('label', { class: 'field' }, h('span', {}, 'Helper address'), h('input', { id: 'ai-url', type: 'url', value: st.aiUrl, oninput: (e) => { st.aiUrl = e.target.value.trim(); save(); } })),
+            h('label', { class: 'field' }, h('span', {}, 'Passcode'), h('input', { id: 'ai-pass', type: 'password', value: st.aiPass, oninput: (e) => { st.aiPass = e.target.value; save(); } }))),
+        ],
       h('button', { class: 'btn small soft', onclick: async (e) => {
-        e.target.textContent = 'Checking…';
+        const b = e.currentTarget; b.textContent = 'Checking…';
         try {
           await askCat([{ role: 'user', content: 'Say hi in five words.' }], buildContext(), st);
-          e.target.textContent = 'Connected ✓';
-        } catch (err) { e.target.textContent = `Couldn’t connect (${err.message})`; }
+          b.textContent = 'Connected ✓';
+        } catch (err) { b.textContent = `Couldn’t connect: ${err.message}`; }
       } }, 'Test connection')),
     h('div', { class: 'card' },
       h('b', {}, 'Backup'),
@@ -904,7 +915,7 @@ function openChat(mode, topic) {
   const ask = async (msgs) => {
     const t = typing(); sendBtn.disabled = true;
     let reply;
-    try { reply = await askCat(msgs, buildContext(), state.settings); } catch (e) { reply = offlineReply(nextStepText(), !navigator.onLine); }
+    try { reply = await askCat(msgs, buildContext(), state.settings); } catch (e) { reply = offlineReply(nextStepText(), !navigator.onLine, e?.message); }
     t.remove(); sendBtn.disabled = false;
     hist.push({ role: 'assistant', content: reply }); state.chats[s.id] = hist.slice(-30); save(); draw(); sfx.softTap();
   };
@@ -975,7 +986,7 @@ async function boot() {
   }, 30000);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') store.saveNow(state); });
   store.persist();
-  if (!window.__ARTIFACT && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+  if (!window.__ARTIFACT && !window.__STANDALONE && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 }
