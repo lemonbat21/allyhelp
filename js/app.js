@@ -807,7 +807,7 @@ function openCatMenu() {
         const r = petcat.getBoundingClientRect();
         for (let i = 0; i < 4; i++) setTimeout(() => pet(r.left + r.width * (0.35 + Math.random() * 0.3), r.top + r.height * 0.35), i * 160);
       } }, '🤍 Pet'),
-      h('button', { class: 'btn primary', onclick: openHelp }, '🆘 Help')));
+      h('button', { class: 'btn primary', onclick: openHelp }, '🫶 Help')));
   openOverlay(node, 'center');
 }
 
