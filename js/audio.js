@@ -178,8 +178,8 @@ export function whoosh() {
   const t = c.currentTime + 0.01;
   const n = c.createBufferSource(); n.buffer = noiseBuffer(c, 0.4);
   const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.4;
-  bp.frequency.setValueAtTime(500, t); bp.frequency.exponentialRampToValueAtTime(2600, t + 0.28);
+  bp.frequency.setValueAtTime(900, t); bp.frequency.exponentialRampToValueAtTime(400, t + 0.3);
   const g = c.createGain();
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.1); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.06, t + 0.12); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.36);
   n.connect(bp).connect(g).connect(master); n.start(t); n.stop(t + 0.4);
 }

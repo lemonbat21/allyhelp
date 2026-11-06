@@ -231,7 +231,7 @@ function toggleStep(s, g, st, checkBtn) {
       li.style.setProperty('--h', `${li.offsetHeight}px`);
       li.classList.add('leaving');
       sfx.whoosh();
-    }, 320);
+    }, 380);
   }
   checkBtn?.setAttribute('aria-pressed', 'true');
   sfx.tick();
@@ -255,7 +255,7 @@ function toggleStep(s, g, st, checkBtn) {
     }, 2300);
   } else {
     maybePraise();
-    setTimeout(renderView, willHide ? 900 : 520);
+    setTimeout(renderView, willHide ? 1120 : 520);
   }
 }
 function maybeCelebrate(s) {
