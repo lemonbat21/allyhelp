@@ -1,5 +1,5 @@
 // Offline support: the whole app is cached on first visit.
-const VERSION = 'cloudcat-v3';
+const VERSION = 'cloudcat-v4';
 const SHELL = [
   './', 'index.html', 'styles.css', 'manifest.webmanifest',
   'js/app.js', 'js/data.js', 'js/persona.js', 'js/storage.js', 'js/audio.js', 'js/ai.js',
@@ -28,8 +28,9 @@ self.addEventListener('fetch', (e) => {
     return;
   }
   if (url.origin !== location.origin) return;
-  // App files: network first (so updates arrive), cache fallback (so it works offline).
-  e.respondWith(fetch(e.request).then((r) => {
+  // App files: network first, always re-checking with the server (so a new version shows straight away),
+  // cache fallback (so it works offline).
+  e.respondWith(fetch(e.request.url, { cache: 'no-cache', credentials: 'same-origin' }).then((r) => {
     const copy = r.clone(); caches.open(VERSION).then((c) => c.put(e.request, copy)); return r;
   }).catch(() => caches.match(e.request, { ignoreSearch: true }).then((r) => r || caches.match('index.html'))));
 });
