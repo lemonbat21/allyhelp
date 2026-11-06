@@ -21,7 +21,8 @@ EXPORT = re.compile(r"^export\s+(async\s+function|function|const|let)\s+(\w+)", 
 
 def wrap_module(name: str) -> str:
     src = (ROOT / "js" / f"{name}.js").read_text()
-    src = IMPORT_NAMED.sub(lambda m: f"const {{{m.group(1)}}} = __mod_{m.group(2)};", src)
+    # `import { a as b }` becomes destructuring `const { a: b }`
+    src = IMPORT_NAMED.sub(lambda m: f"const {{{re.sub(r'(\w+)\s+as\s+(\w+)', r'\1: \2', m.group(1))}}} = __mod_{m.group(2)};", src)
     src = IMPORT_STAR.sub(lambda m: f"const {m.group(1)} = __mod_{m.group(2)};", src)
     names = [m.group(2) for m in EXPORT.finditer(src)]
     src = EXPORT.sub(lambda m: f"{m.group(1)} {m.group(2)}", src)
